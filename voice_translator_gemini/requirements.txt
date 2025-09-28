@@ -1,0 +1,4 @@
+speechrecognition
+gtts
+pygame
+google-generativeai
