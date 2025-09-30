@@ -6,6 +6,9 @@
     <title>Laura-bot Quiz Interface</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Dark Modern Gradient Theme -->
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/modern-ui.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/mobile-responsive.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/template-fixes.css') }}" rel="stylesheet">
     <style>
@@ -17,8 +20,8 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: linear-gradient(135deg, #0c0c1d 0%, #111132 50%, #1a1a2e 100%);
+            color: #ffffff;
             min-height: 100vh;
         }
 
