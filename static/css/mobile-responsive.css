@@ -1,0 +1,588 @@
+/* Laura-bot Mobile-First Responsive Design */
+/* Enhanced mobile optimization for all templates */
+
+/* Base Mobile-First Styles */
+@media screen and (max-width: 768px) {
+    
+    /* Global Mobile Optimizations */
+    * {
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+    
+    body {
+        font-size: 16px; /* Prevent iOS zoom on input focus */
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+        touch-action: manipulation;
+        overflow-x: hidden;
+        padding: 0;
+        margin: 0;
+    }
+    
+    /* Enhanced Touch Targets */
+    .btn, button, .card, .subject-card, .answer-option {
+        min-height: 44px; /* Apple's recommended minimum touch target */
+        min-width: 44px;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: rgba(76, 175, 80, 0.3);
+    }
+    
+    /* Navbar Mobile Optimization */
+    .navbar {
+        padding: 10px 15px;
+        flex-wrap: wrap;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+    
+    .navbar h1 {
+        font-size: 1.5em;
+        margin-bottom: 5px;
+        width: 100%;
+        text-align: center;
+    }
+    
+    .nav-links {
+        justify-content: center;
+        width: 100%;
+        margin-top: 10px;
+        gap: 8px;
+    }
+    
+    .nav-links .btn {
+        font-size: 12px;
+        padding: 6px 12px;
+        white-space: nowrap;
+    }
+    
+    /* Header Mobile Optimization */
+    .header {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .header h1 {
+        font-size: 2em;
+        margin-bottom: 10px;
+    }
+    
+    /* Status Bar Mobile */
+    .status-bar {
+        flex-direction: column;
+        gap: 8px;
+        align-items: center;
+    }
+    
+    .status-item {
+        width: 100%;
+        max-width: 300px;
+        text-align: center;
+        padding: 8px 15px;
+        font-size: 14px;
+    }
+    
+    /* Container Mobile */
+    .container {
+        padding: 10px;
+        max-width: 100%;
+    }
+    
+    /* Dashboard Grid Mobile */
+    .dashboard-grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px;
+    }
+    
+    /* Card Mobile Optimization */
+    .card {
+        margin-bottom: 15px;
+        padding: 15px;
+        border-radius: 10px;
+    }
+    
+    .card-header h2 {
+        font-size: 1.3em;
+    }
+    
+    /* Subject Selection Mobile */
+    .subject-selection, .subject-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px;
+    }
+    
+    .subject-card {
+        padding: 15px 10px;
+        text-align: center;
+    }
+    
+    .subject-card h3 {
+        font-size: 1.1em;
+        margin: 8px 0 5px 0;
+    }
+    
+    .subject-card p {
+        font-size: 0.9em;
+    }
+    
+    .subject-icon {
+        font-size: 2em !important;
+    }
+    
+    /* Button Mobile Optimization */
+    .btn {
+        padding: 12px 15px;
+        font-size: 14px;
+        border-radius: 25px;
+        margin: 5px 2px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+    
+    .btn i {
+        margin-right: 5px;
+    }
+    
+    /* Quick Actions Mobile */
+    .quick-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .quick-actions .btn {
+        width: 100%;
+        margin: 0;
+    }
+    
+    /* Stats Grid Mobile */
+    .stats-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px;
+    }
+    
+    .stat-item {
+        padding: 10px;
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 1.5em;
+    }
+    
+    .stat-label {
+        font-size: 0.9em;
+    }
+    
+    /* Quiz Container Mobile */
+    .quiz-container {
+        flex-direction: column !important;
+        gap: 15px;
+    }
+    
+    .quiz-main, .quiz-sidebar {
+        flex: none;
+        width: 100%;
+    }
+    
+    /* Question Mobile */
+    .question-header {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .question-counter, .question-timer {
+        font-size: 14px;
+        padding: 6px 12px;
+    }
+    
+    .question-text {
+        font-size: 1.1em;
+        padding: 15px;
+        line-height: 1.5;
+    }
+    
+    /* Answer Options Mobile */
+    .answer-options {
+        gap: 12px;
+    }
+    
+    .answer-option {
+        padding: 12px 15px;
+        border-radius: 8px;
+        min-height: 50px;
+    }
+    
+    .option-letter {
+        width: 25px;
+        height: 25px;
+        font-size: 14px;
+    }
+    
+    /* Quiz Controls Mobile */
+    .quiz-controls {
+        flex-direction: column;
+        gap: 10px;
+        position: sticky;
+        bottom: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+    }
+    
+    .quiz-controls .btn {
+        width: 100%;
+        margin: 0;
+    }
+    
+    /* Hardware Controls Mobile */
+    .control-grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px;
+    }
+    
+    .control-panel {
+        padding: 15px;
+    }
+    
+    .servo-controls {
+        grid-template-columns: 1fr !important;
+        gap: 10px;
+    }
+    
+    .servo-slider {
+        padding: 10px;
+    }
+    
+    .slider {
+        height: 8px;
+    }
+    
+    .sensor-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px;
+    }
+    
+    .sensor-card {
+        padding: 10px;
+    }
+    
+    .sensor-value {
+        font-size: 1.2em;
+    }
+    
+    /* Voice Controls Mobile */
+    .voice-visualizer {
+        height: 60px;
+        margin: 15px 0;
+    }
+    
+    .voice-bar {
+        width: 3px;
+        margin: 0 1px;
+    }
+    
+    .voice-commands {
+        font-size: 0.8em;
+        text-align: left;
+    }
+    
+    /* Gesture Display Mobile */
+    .gesture-display {
+        min-height: 80px;
+        padding: 15px;
+    }
+    
+    .gesture-icon {
+        font-size: 2em !important;
+    }
+    
+    /* Progress Analytics Mobile */
+    .performance-breakdown {
+        grid-template-columns: 1fr !important;
+        gap: 15px;
+    }
+    
+    .performance-card {
+        padding: 15px;
+        text-align: center;
+    }
+    
+    /* Form Controls Mobile */
+    .form-control {
+        font-size: 16px; /* Prevent iOS zoom */
+        padding: 12px;
+        border-radius: 8px;
+    }
+    
+    .difficulty-buttons {
+        flex-direction: column !important;
+        gap: 8px;
+    }
+    
+    .difficulty-btn {
+        padding: 12px;
+        font-size: 14px;
+    }
+    
+    /* Activity Log Mobile */
+    .recent-activity, .log-area {
+        max-height: 150px;
+        font-size: 0.9em;
+    }
+    
+    .activity-item {
+        padding: 8px 0;
+        font-size: 0.85em;
+    }
+    
+    /* Notification Mobile */
+    .notification {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        width: auto;
+        z-index: 9999;
+        padding: 12px 15px;
+        border-radius: 8px;
+        font-size: 14px;
+        text-align: center;
+    }
+    
+    /* Emergency Controls Mobile */
+    .emergency-controls {
+        padding: 15px;
+        text-align: center;
+    }
+    
+    .emergency-btn {
+        width: 100%;
+        margin: 5px 0;
+        padding: 12px;
+        font-size: 14px;
+    }
+    
+    /* Chart Containers Mobile */
+    .chart-container {
+        height: 250px !important;
+        margin: 15px 0;
+    }
+    
+    /* Results Summary Mobile */
+    .results-summary {
+        text-align: center;
+        padding: 15px;
+    }
+    
+    .score-display {
+        font-size: 3em !important;
+        margin: 15px 0;
+    }
+    
+    /* Interactive Learning Mobile */
+    .learning-container {
+        flex-direction: column !important;
+    }
+    
+    .learning-main, .learning-sidebar {
+        width: 100%;
+        flex: none;
+    }
+    
+    /* Hide non-essential elements on small screens */
+    .desktop-only {
+        display: none !important;
+    }
+    
+    /* Show mobile-specific elements */
+    .mobile-only {
+        display: block !important;
+    }
+    
+    /* Improve scrolling performance */
+    .card, .control-panel {
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+    }
+    
+    /* Touch-friendly progress bars */
+    .progress-bar {
+        height: 10px;
+        border-radius: 5px;
+        margin: 15px 0;
+    }
+    
+    .progress-fill {
+        border-radius: 5px;
+    }
+}
+
+/* Tablet Optimization (768px - 1024px) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .control-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .subject-selection {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .quiz-container {
+        flex-direction: row;
+    }
+    
+    .quiz-main {
+        flex: 2;
+    }
+    
+    .quiz-sidebar {
+        flex: 1;
+    }
+}
+
+/* Extra Small Devices (max-width: 480px) */
+@media screen and (max-width: 480px) {
+    body {
+        font-size: 14px;
+    }
+    
+    .header h1 {
+        font-size: 1.5em;
+    }
+    
+    .btn {
+        font-size: 13px;
+        padding: 10px 12px;
+    }
+    
+    .card {
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .subject-selection {
+        grid-template-columns: 1fr !important;
+        gap: 8px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .sensor-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .question-text {
+        font-size: 1em;
+        padding: 12px;
+    }
+    
+    .score-display {
+        font-size: 2.5em !important;
+    }
+}
+
+/* Landscape Phone Optimization */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    .header {
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .header h1 {
+        font-size: 1.3em;
+        margin-bottom: 5px;
+    }
+    
+    .status-bar {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    
+    .status-item {
+        font-size: 12px;
+        padding: 5px 10px;
+    }
+    
+    .card {
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .quiz-controls {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        flex-direction: row;
+        gap: 5px;
+        padding: 8px;
+        background: rgba(0, 0, 0, 0.9);
+        backdrop-filter: blur(10px);
+    }
+}
+
+/* Dark mode considerations for mobile */
+@media (prefers-color-scheme: dark) {
+    .btn {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* Accessibility improvements for mobile */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .btn {
+        border: 2px solid currentColor;
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 255, 255, 0.5);
+    }
+    
+    .answer-option {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Print styles for mobile screens */
+@media print {
+    .navbar, .quiz-controls, .voice-control, .emergency-controls {
+        display: none !important;
+    }
+    
+    .card {
+        break-inside: avoid;
+    }
+}

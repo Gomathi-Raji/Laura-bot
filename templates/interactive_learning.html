@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laura-bot Interactive Learning</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/mobile-responsive.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/template-fixes.css') }}" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .navbar h1 {
+            font-size: 1.5em;
+        }
+
+        .nav-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary { background: linear-gradient(45deg, #2196F3, #1976D2); }
+        .btn-danger { background: linear-gradient(45deg, #F44336, #D32F2F); }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            height: calc(100vh - 70px);
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            overflow-y: auto;
+        }
+
+        .learning-area {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .subject-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .subject-btn {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .subject-btn:hover,
+        .subject-btn.active {
+            background: rgba(76, 175, 80, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .quiz-container {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+        }
+
+        .quiz-container.active {
+            display: flex;
+        }
+
+        .question-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .question-number {
+            color: #4CAF50;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .options-container {
+            display: grid;
+            gap: 10px;
+        }
+
+        .option {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            background: rgba(33, 150, 243, 0.3);
+            border-color: #2196F3;
+        }
+
+        .option.correct {
+            background: rgba(76, 175, 80, 0.3);
+            border-color: #4CAF50;
+        }
+
+        .option.incorrect {
+            background: rgba(244, 67, 54, 0.3);
+            border-color: #F44336;
+        }
+
+        .quiz-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+            height: 8px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(45deg, #4CAF50, #8BC34A);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .score-display {
+            text-align: center;
+            padding: 20px;
+            background: rgba(76, 175, 80, 0.2);
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .score-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .explanation-area {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .explanation-area.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stats-panel {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .voice-controls {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .voice-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #F44336;
+            margin: 0 auto 10px;
+            transition: all 0.3s ease;
+        }
+
+        .voice-indicator.listening {
+            background: #4CAF50;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success { background: #4CAF50; }
+        .notification.error { background: #F44336; }
+        .notification.info { background: #2196F3; }
+
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr auto;
+            }
+            
+            .sidebar {
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1><i class="fas fa-robot"></i> Laura-bot Learning Interface</h1>
+        <div class="nav-controls">
+            <button class="btn" onclick="goToDashboard()">
+                <i class="fas fa-home"></i> Dashboard
+            </button>
+            <button class="btn btn-secondary" onclick="saveProgress()">
+                <i class="fas fa-save"></i> Save
+            </button>
+            <button class="btn btn-danger" onclick="endSession()">
+                <i class="fas fa-stop"></i> End Session
+            </button>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <!-- Left Sidebar - Controls -->
+        <div class="sidebar">
+            <h3><i class="fas fa-cog"></i> Learning Controls</h3>
+            
+            <div class="voice-controls">
+                <h4>Voice Interaction</h4>
+                <div class="voice-indicator" id="voice-indicator"></div>
+                <button class="btn" onclick="toggleVoice()" id="voice-btn">
+                    <i class="fas fa-microphone"></i> Start Voice
+                </button>
+            </div>
+
+            <div class="stats-panel">
+                <h4>Session Stats</h4>
+                <div class="stat-item">
+                    <span>Questions:</span>
+                    <span id="question-count">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>Correct:</span>
+                    <span id="correct-count">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>Score:</span>
+                    <span id="score-percentage">0%</span>
+                </div>
+                <div class="stat-item">
+                    <span>Time:</span>
+                    <span id="session-time">00:00</span>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill progress-width-0" id="progress-fill"></div>
+            </div>
+
+            <button class="btn btn-secondary full-width-responsive" onclick="getHint()">
+                <i class="fas fa-lightbulb"></i> Get Hint
+            </button>
+            
+            <button class="btn full-width-responsive" onclick="skipQuestion()">
+                <i class="fas fa-forward"></i> Skip Question
+            </button>
+        </div>
+
+        <!-- Center - Learning Area -->
+        <div class="learning-area">
+            <!-- Subject Selection -->
+            <div id="subject-selection">
+                <h2 class="text-center margin-bottom-30">Select Learning Subject</h2>
+                <div class="subject-selector">
+                    <div class="subject-btn" onclick="selectSubject('Mathematics')">
+                        <i class="fas fa-calculator"></i><br>Mathematics
+                    </div>
+                    <div class="subject-btn" onclick="selectSubject('Science')">
+                        <i class="fas fa-flask"></i><br>Science
+                    </div>
+                    <div class="subject-btn" onclick="selectSubject('Physics')">
+                        <i class="fas fa-atom"></i><br>Physics
+                    </div>
+                    <div class="subject-btn" onclick="selectSubject('Chemistry')">
+                        <i class="fas fa-vial"></i><br>Chemistry
+                    </div>
+                </div>
+                
+                <div class="text-center margin-top-30">
+                    <button class="btn" onclick="startQuiz()" id="start-quiz-btn" disabled>
+                        <i class="fas fa-play"></i> Start Learning Quiz
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Container -->
+            <div class="quiz-container" id="quiz-container">
+                <div class="question-card" id="question-card">
+                    <div class="question-number" id="question-number">Question 1 of 5</div>
+                    <div class="question-text" id="question-text">Loading question...</div>
+                    <div class="options-container" id="options-container">
+                        <!-- Options will be loaded here -->
+                    </div>
+                </div>
+
+                <div class="quiz-controls">
+                    <button class="btn btn-secondary" onclick="previousQuestion()" id="prev-btn" disabled>
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button class="btn" onclick="submitAnswer()" id="submit-btn" disabled>
+                        <i class="fas fa-check"></i> Submit Answer
+                    </button>
+                    <button class="btn btn-secondary" onclick="nextQuestion()" id="next-btn" disabled>
+                        <i class="fas fa-arrow-right"></i> Next
+                    </button>
+                </div>
+
+                <div class="explanation-area" id="explanation-area">
+                    <h4><i class="fas fa-info-circle"></i> Explanation</h4>
+                    <div id="explanation-text"></div>
+                </div>
+            </div>
+
+            <!-- Results Display -->
+            <div class="score-display hidden" id="results-display">
+                <h2>Quiz Completed!</h2>
+                <div class="score-number" id="final-score">0%</div>
+                <p id="results-message">Great job!</p>
+                <div class="margin-v-20">
+                    <button class="btn" onclick="retakeQuiz()">
+                        <i class="fas fa-redo"></i> Retake Quiz
+                    </button>
+                    <button class="btn btn-secondary" onclick="newQuiz()">
+                        <i class="fas fa-plus"></i> New Subject
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar - Progress -->
+        <div class="sidebar">
+            <h3><i class="fas fa-chart-line"></i> Progress Tracking</h3>
+            
+            <div class="stats-panel">
+                <h4>Overall Progress</h4>
+                <div class="stat-item">
+                    <span>Sessions:</span>
+                    <span id="total-sessions">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>Avg Score:</span>
+                    <span id="avg-score">0%</span>
+                </div>
+                <div class="stat-item">
+                    <span>Study Time:</span>
+                    <span id="total-time">0h</span>
+                </div>
+                <div class="stat-item">
+                    <span>Streak:</span>
+                    <span id="streak-count">0 days</span>
+                </div>
+            </div>
+
+            <h4>Recent Topics</h4>
+            <div id="recent-topics" class="recent-topics-container">
+                <div class="text-center opacity-07">No recent topics</div>
+            </div>
+
+            <button class="btn btn-secondary full-width-responsive" onclick="viewDetailedProgress()">
+                <i class="fas fa-chart-bar"></i> Detailed Analytics
+            </button>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // Global variables
+        const socket = io();
+        let currentSubject = null;
+        let currentQuiz = null;
+        let currentQuestionIndex = 0;
+        let selectedAnswer = null;
+        let score = 0;
+        let sessionStartTime = Date.now();
+        let isVoiceActive = false;
+
+        // Socket event handlers
+        socket.on('connect', function() {
+            console.log('Connected to Laura-bot learning server');
+            showNotification('Connected to learning server', 'success');
+            
+            // Join learning session
+            socket.emit('join_learning_session', {
+                user_id: 'student_' + Date.now(),
+                subject: currentSubject || 'general'
+            });
+        });
+
+        socket.on('disconnect', function() {
+            console.log('Disconnected from server');
+            showNotification('Connection lost', 'error');
+        });
+
+        socket.on('learning_session_joined', function(data) {
+            if (data.success) {
+                currentSessionId = data.session_id;
+                addLogEntry(`✅ Joined ${data.subject} learning session`);
+                showNotification(`Welcome to ${data.subject} learning!`, 'success');
+            }
+        });
+
+        socket.on('live_progress_update', function(data) {
+            updateLearningProgress(data);
+        });
+
+        socket.on('voice_command_response', function(data) {
+            handleVoiceCommand(data);
+        });
+
+        socket.on('voice_result', function(data) {
+            if (data.error) {
+                showNotification(`Voice error: ${data.error}`, 'error');
+            } else {
+                showNotification(`Voice command processed: ${data.transcription}`, 'success');
+                processVoiceCommand(data.transcription);
+            }
+            updateVoiceIndicator(false);
+        });
+
+        socket.on('learning_analytics_data', function(data) {
+            updateAnalyticsDisplay(data);
+        });
+
+        // Utility functions
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            setTimeout(() => notification.classList.remove('show'), 3000);
+        }
+
+        function updateStats() {
+            const questionCount = currentQuiz ? currentQuiz.questions.length : 0;
+            const correctCount = score;
+            const percentage = questionCount > 0 ? Math.round((correctCount / questionCount) * 100) : 0;
+            const sessionTime = Math.floor((Date.now() - sessionStartTime) / 1000);
+            const minutes = Math.floor(sessionTime / 60);
+            const seconds = sessionTime % 60;
+
+            document.getElementById('question-count').textContent = questionCount;
+            document.getElementById('correct-count').textContent = correctCount;
+            document.getElementById('score-percentage').textContent = percentage + '%';
+            document.getElementById('session-time').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateProgress() {
+            if (!currentQuiz) return;
+            const progress = ((currentQuestionIndex + 1) / currentQuiz.questions.length) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+        }
+
+        function updateVoiceIndicator(listening) {
+            const indicator = document.getElementById('voice-indicator');
+            const btn = document.getElementById('voice-btn');
+            
+            if (listening) {
+                indicator.classList.add('listening');
+                btn.innerHTML = '<i class="fas fa-stop"></i> Stop Voice';
+                btn.className = 'btn btn-danger';
+            } else {
+                indicator.classList.remove('listening');
+                btn.innerHTML = '<i class="fas fa-microphone"></i> Start Voice';
+                btn.className = 'btn';
+            }
+            isVoiceActive = listening;
+        }
+
+        // Subject selection
+        function selectSubject(subject) {
+            currentSubject = subject;
+            
+            // Update UI
+            document.querySelectorAll('.subject-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            document.getElementById('start-quiz-btn').disabled = false;
+            showNotification(`Subject selected: ${subject}`, 'success');
+            
+            // Emit subject change to server for real-time updates
+            socket.emit('join_learning_session', {
+                user_id: 'student_' + Date.now(),
+                subject: subject
+            });
+        }
+
+        // Real-time learning functions
+        function updateLearningProgress(data) {
+            // Update session statistics in real-time
+            const scoreElement = document.querySelector('#current-score');
+            const timeElement = document.querySelector('#session-time');
+            const questionsElement = document.querySelector('#questions-answered');
+            
+            if (scoreElement) {
+                scoreElement.textContent = data.score + '%';
+                // Animate score change
+                scoreElement.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    scoreElement.style.transform = 'scale(1)';
+                }, 200);
+            }
+            
+            if (timeElement) {
+                timeElement.textContent = Math.round(data.time_spent) + ' min';
+            }
+            
+            if (questionsElement) {
+                questionsElement.textContent = data.questions_answered;
+            }
+            
+            addLogEntry(`📊 Progress update: ${data.subject} - ${data.score}%`);
+        }
+
+        function handleVoiceCommand(data) {
+            // Update voice status display
+            const voiceStatus = document.querySelector('#voice-command-status');
+            if (voiceStatus) {
+                voiceStatus.innerHTML = `
+                    <strong>Last Command:</strong> ${data.command}<br>
+                    <strong>Confidence:</strong> ${data.confidence}%<br>
+                    <strong>Action:</strong> ${data.message}
+                `;
+            }
+            
+            // Process voice commands
+            switch (data.action) {
+                case 'quiz_started':
+                    startQuiz();
+                    break;
+                case 'next_question':
+                    // Implementation for next question
+                    addLogEntry('🎤 Voice: Moving to next question');
+                    break;
+                case 'repeat_question':
+                    addLogEntry('🎤 Voice: Repeating current question');
+                    break;
+                case 'show_help':
+                    showVoiceCommands();
+                    break;
+                default:
+                    addLogEntry(`🎤 Voice: ${data.message}`);
+            }
+        }
+
+        function updateAnalyticsDisplay(data) {
+            // Create or update analytics display
+            let analyticsPanel = document.querySelector('#live-analytics');
+            
+            if (!analyticsPanel) {
+                // Create analytics panel if it doesn't exist
+                analyticsPanel = document.createElement('div');
+                analyticsPanel.id = 'live-analytics';
+                analyticsPanel.className = 'analytics-panel';
+                
+                const sidebar = document.querySelector('.learning-sidebar');
+                if (sidebar) {
+                    sidebar.appendChild(analyticsPanel);
+                }
+            }
+            
+            analyticsPanel.innerHTML = `
+                <h4><i class="fas fa-chart-line"></i> Live Analytics</h4>
+                <div class="analytics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">${data.total_sessions}</div>
+                        <div class="metric-label">Sessions</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${data.average_score}%</div>
+                        <div class="metric-label">Avg Score</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${data.time_spent_hours}h</div>
+                        <div class="metric-label">Study Time</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">+${data.improvement_rate}%</div>
+                        <div class="metric-label">Growth</div>
+                    </div>
+                </div>
+                <div class="topic-insights">
+                    <div class="strong-topics">
+                        <strong>💪 Strong Areas:</strong><br>
+                        ${data.strong_topics.join(', ')}
+                    </div>
+                    <div class="improvement-areas">
+                        <strong>🎯 Focus Areas:</strong><br>
+                        ${data.areas_for_improvement.join(', ')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function showVoiceCommands() {
+            const commands = [
+                '"Start Quiz" - Begin a new quiz session',
+                '"Next Question" - Move to next question',
+                '"Repeat Question" - Repeat current question',  
+                '"Help" - Show available commands',
+                '"Select Math/Science/English" - Choose subject'
+            ];
+            
+            const commandsHtml = commands.map(cmd => `<li>${cmd}</li>`).join('');
+            
+            showNotification(`Available Voice Commands:<ul>${commandsHtml}</ul>`, 'info');
+        }
+
+        // Quiz functions
+        function startQuiz() {
+            if (!currentSubject) {
+                showNotification('Please select a subject first', 'error');
+                return;
+            }
+
+            showNotification('Generating quiz...', 'info');
+            
+            fetch('/api/generate_quiz', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    subject: currentSubject,
+                    difficulty: 1,
+                    num_questions: 5
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentQuiz = data.quiz;
+                    currentQuestionIndex = 0;
+                    score = 0;
+                    sessionStartTime = Date.now();
+                    
+                    document.getElementById('subject-selection').style.display = 'none';
+                    document.getElementById('quiz-container').classList.add('active');
+                    
+                    loadQuestion();
+                    updateStats();
+                    showNotification('Quiz started!', 'success');
+                } else {
+                    showNotification(`Error: ${data.error}`, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Failed to generate quiz', 'error');
+            });
+        }
+
+        function loadQuestion() {
+            if (!currentQuiz || currentQuestionIndex >= currentQuiz.questions.length) {
+                showResults();
+                return;
+            }
+
+            const question = currentQuiz.questions[currentQuestionIndex];
+            document.getElementById('question-number').textContent = 
+                `Question ${currentQuestionIndex + 1} of ${currentQuiz.questions.length}`;
+            document.getElementById('question-text').textContent = question.question;
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => selectOption(index, optionDiv);
+                optionsContainer.appendChild(optionDiv);
+            });
+
+            // Reset buttons
+            document.getElementById('submit-btn').disabled = true;
+            document.getElementById('prev-btn').disabled = currentQuestionIndex === 0;
+            document.getElementById('explanation-area').classList.remove('show');
+            
+            selectedAnswer = null;
+            updateProgress();
+        }
+
+        function selectOption(index, element) {
+            // Clear previous selection
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Select current option
+            element.classList.add('selected');
+            selectedAnswer = index;
+            document.getElementById('submit-btn').disabled = false;
+        }
+
+        function submitAnswer() {
+            if (selectedAnswer === null) return;
+
+            const question = currentQuiz.questions[currentQuestionIndex];
+            const isCorrect = selectedAnswer === 0; // Assuming first option is always correct for demo
+            
+            if (isCorrect) {
+                score++;
+                document.querySelectorAll('.option')[selectedAnswer].classList.add('correct');
+                showNotification('Correct answer!', 'success');
+            } else {
+                document.querySelectorAll('.option')[selectedAnswer].classList.add('incorrect');
+                document.querySelectorAll('.option')[0].classList.add('correct'); // Show correct answer
+                showNotification('Incorrect answer', 'error');
+            }
+
+            // Show explanation
+            document.getElementById('explanation-text').innerHTML = 
+                `<strong>Correct Answer:</strong> ${question.options[0]}<br><br>
+                 <strong>Explanation:</strong> This is a sample explanation for the question.`;
+            document.getElementById('explanation-area').classList.add('show');
+
+            // Enable next button
+            document.getElementById('next-btn').disabled = false;
+            document.getElementById('submit-btn').disabled = true;
+            
+            updateStats();
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            loadQuestion();
+        }
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        }
+
+        function showResults() {
+            const percentage = Math.round((score / currentQuiz.questions.length) * 100);
+            
+            document.getElementById('quiz-container').classList.remove('active');
+            document.getElementById('results-display').style.display = 'block';
+            document.getElementById('final-score').textContent = percentage + '%';
+            
+            let message = '';
+            if (percentage >= 90) message = 'Excellent work! Outstanding performance!';
+            else if (percentage >= 70) message = 'Great job! Well done!';
+            else if (percentage >= 50) message = 'Good effort! Keep practicing!';
+            else message = 'Keep learning! You\'ll improve with practice!';
+            
+            document.getElementById('results-message').textContent = message;
+            showNotification(`Quiz completed: ${percentage}%`, 'success');
+        }
+
+        // Voice functions
+        function toggleVoice() {
+            if (isVoiceActive) {
+                updateVoiceIndicator(false);
+                showNotification('Voice recognition stopped', 'info');
+            } else {
+                updateVoiceIndicator(true);
+                showNotification('Voice recognition started', 'info');
+                
+                fetch('/api/voice_interaction', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'start_listening' })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        updateVoiceIndicator(false);
+                        showNotification(`Voice error: ${data.error}`, 'error');
+                    }
+                });
+            }
+        }
+
+        function processVoiceCommand(command) {
+            const cmd = command.toLowerCase();
+            
+            if (cmd.includes('next')) {
+                nextQuestion();
+            } else if (cmd.includes('previous') || cmd.includes('back')) {
+                previousQuestion();
+            } else if (cmd.includes('submit') || cmd.includes('answer')) {
+                submitAnswer();
+            } else if (cmd.includes('skip')) {
+                skipQuestion();
+            } else if (cmd.includes('hint')) {
+                getHint();
+            }
+        }
+
+        // Other functions
+        function getHint() {
+            if (!currentQuiz || currentQuestionIndex >= currentQuiz.questions.length) return;
+            
+            showNotification('Here\'s a hint: Think about the fundamental concepts!', 'info');
+        }
+
+        function skipQuestion() {
+            showNotification('Question skipped', 'info');
+            nextQuestion();
+        }
+
+        function retakeQuiz() {
+            document.getElementById('results-display').style.display = 'none';
+            startQuiz();
+        }
+
+        function newQuiz() {
+            document.getElementById('results-display').style.display = 'none';
+            document.getElementById('quiz-container').classList.remove('active');
+            document.getElementById('subject-selection').style.display = 'block';
+            currentSubject = null;
+            currentQuiz = null;
+            
+            // Reset subject selection
+            document.querySelectorAll('.subject-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('start-quiz-btn').disabled = true;
+        }
+
+        function goToDashboard() {
+            window.location.href = '/';
+        }
+
+        function saveProgress() {
+            showNotification('Progress saved successfully!', 'success');
+        }
+
+        function endSession() {
+            if (confirm('Are you sure you want to end this learning session?')) {
+                window.location.href = '/';
+            }
+        }
+
+        function viewDetailedProgress() {
+            window.open('/progress', '_blank');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Laura-bot Learning Interface initialized');
+            updateStats();
+            
+            // Update session time every second
+            setInterval(updateStats, 1000);
+        });
+    </script>
+</body>
+</html>

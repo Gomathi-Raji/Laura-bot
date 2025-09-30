@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laura-bot Learning Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/mobile-responsive.css') }}" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .status-online { background: rgba(76, 175, 80, 0.3); }
+        .status-offline { background: rgba(244, 67, 54, 0.3); }
+        .status-active { background: rgba(33, 150, 243, 0.3); }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card-header i {
+            font-size: 1.5em;
+            margin-right: 10px;
+            color: #fff;
+        }
+
+        .card-header h2 {
+            font-size: 1.3em;
+            color: #fff;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary { background: linear-gradient(45deg, #2196F3, #1976D2); }
+        .btn-secondary { background: linear-gradient(45deg, #9C27B0, #7B1FA2); }
+        .btn-warning { background: linear-gradient(45deg, #FF9800, #F57C00); }
+        .btn-danger { background: linear-gradient(45deg, #F44336, #D32F2F); }
+
+        .subject-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+            height: 8px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(45deg, #4CAF50, #8BC34A);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .stat-number {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .hardware-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .response-area {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            min-height: 60px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .recent-activity {
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .activity-item {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9em;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success { background: #4CAF50; }
+        .notification.error { background: #F44336; }
+        .notification.info { background: #2196F3; }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .subject-grid,
+            .hardware-controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .status-bar {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><i class="fas fa-robot"></i> Laura-bot Learning Dashboard</h1>
+        
+        <!-- Navigation Links -->
+        <div style="margin: 20px 0; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+            <a href="/learn" class="btn btn-primary">
+                <i class="fas fa-graduation-cap"></i> Interactive Learning
+            </a>
+            <a href="/quiz" class="btn btn-secondary">
+                <i class="fas fa-brain"></i> Quiz System
+            </a>
+            <a href="/progress" class="btn btn-warning">
+                <i class="fas fa-chart-line"></i> Progress Analytics
+            </a>
+            <a href="/hardware" class="btn btn-danger">
+                <i class="fas fa-cogs"></i> Hardware Control
+            </a>
+        </div>
+        
+        <div class="status-bar">
+            <div class="status-item status-online" id="server-status">
+                <i class="fas fa-server"></i>
+                <span>Server: Online</span>
+            </div>
+            <div class="status-item status-offline" id="hardware-status">
+                <i class="fas fa-microchip"></i>
+                <span>Arduino: Simulation</span>
+            </div>
+            <div class="status-item status-active" id="learning-status">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Learning: Ready</span>
+            </div>
+            <div class="status-item status-online" id="connection-status">
+                <i class="fas fa-wifi"></i>
+                <span>Connection: Active</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Learning Center Card -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-graduation-cap"></i>
+                <h2>Learning Center</h2>
+            </div>
+            
+            <div class="quick-actions">
+                <button class="btn" onclick="startLearningSession()">
+                    <i class="fas fa-play"></i> Start Session
+                </button>
+                <button class="btn btn-primary" onclick="continueLearning()">
+                    <i class="fas fa-forward"></i> Continue
+                </button>
+            </div>
+
+            <div class="subject-grid">
+                <button class="btn btn-warning" onclick="selectSubject('Mathematics')">
+                    <i class="fas fa-calculator"></i> Math
+                </button>
+                <button class="btn btn-warning" onclick="selectSubject('Science')">
+                    <i class="fas fa-flask"></i> Science
+                </button>
+                <button class="btn btn-warning" onclick="selectSubject('Physics')">
+                    <i class="fas fa-atom"></i> Physics
+                </button>
+                <button class="btn btn-warning" onclick="selectSubject('Chemistry')">
+                    <i class="fas fa-vial"></i> Chemistry
+                </button>
+            </div>
+
+            <div class="response-area" id="learning-response"></div>
+        </div>
+
+        <!-- Quiz & Assessment Card -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-clipboard-check"></i>
+                <h2>Quiz & Assessment</h2>
+            </div>
+
+            <div class="quick-actions">
+                <button class="btn btn-secondary" onclick="generateQuiz()">
+                    <i class="fas fa-question"></i> Generate Quiz
+                </button>
+                <button class="btn btn-primary" onclick="takeQuiz()">
+                    <i class="fas fa-pencil-alt"></i> Take Quiz
+                </button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" id="quiz-count">0</div>
+                    <div class="stat-label">Quizzes Taken</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="avg-score">0%</div>
+                    <div class="stat-label">Average Score</div>
+                </div>
+            </div>
+
+            <div class="response-area" id="quiz-response"></div>
+        </div>
+
+        <!-- Progress Tracking Card -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-line"></i>
+                <h2>Progress Tracking</h2>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" id="sessions-count">0</div>
+                    <div class="stat-label">Sessions</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="study-time">0h</div>
+                    <div class="stat-label">Study Time</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="achievements">0</div>
+                    <div class="stat-label">Achievements</div>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <button class="btn btn-primary" onclick="viewProgress()">
+                    <i class="fas fa-chart-bar"></i> View Analytics
+                </button>
+                <button class="btn btn-secondary" onclick="exportProgress()">
+                    <i class="fas fa-download"></i> Export Data
+                </button>
+            </div>
+
+            <div class="response-area" id="progress-response"></div>
+        </div>
+
+        <!-- Hardware Control Card -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-cogs"></i>
+                <h2>Hardware Control</h2>
+            </div>
+
+            <div class="hardware-controls">
+                <button class="btn" onclick="testArduino()">
+                    <i class="fas fa-microchip"></i> Test Arduino
+                </button>
+                <button class="btn btn-primary" onclick="testVoice()">
+                    <i class="fas fa-microphone"></i> Test Voice
+                </button>
+                <button class="btn btn-secondary" onclick="gestureControl()">
+                    <i class="fas fa-hand-paper"></i> Gestures
+                </button>
+                <button class="btn btn-warning" onclick="servoTest()">
+                    <i class="fas fa-cog"></i> Servo Test
+                </button>
+            </div>
+
+            <div class="response-area" id="hardware-response"></div>
+        </div>
+
+        <!-- Voice Interaction Card -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-microphone-alt"></i>
+                <h2>Voice Interaction</h2>
+            </div>
+
+            <div class="quick-actions">
+                <button class="btn" onclick="startListening()" id="voice-btn">
+                    <i class="fas fa-microphone"></i> Start Listening
+                </button>
+                <button class="btn btn-primary" onclick="speakStatus()">
+                    <i class="fas fa-volume-up"></i> Speak Status
+                </button>
+            </div>
+
+            <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin: 10px 0;">
+                <div><strong>Last Command:</strong> <span id="last-command">None</span></div>
+                <div><strong>Response:</strong> <span id="last-response">Ready to listen</span></div>
+            </div>
+
+            <div class="response-area" id="voice-response"></div>
+        </div>
+
+        <!-- Recent Activity Card -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-history"></i>
+                <h2>Recent Activity</h2>
+            </div>
+
+            <div class="recent-activity" id="activity-log">
+                <div class="activity-item">
+                    <i class="fas fa-info-circle"></i> System initialized
+                </div>
+                <div class="activity-item">
+                    <i class="fas fa-wifi"></i> Connected to server
+                </div>
+                <div class="activity-item">
+                    <i class="fas fa-check"></i> Dashboard loaded successfully
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <button class="btn btn-secondary" onclick="clearActivity()">
+                    <i class="fas fa-trash"></i> Clear Log
+                </button>
+                <button class="btn btn-primary" onclick="refreshActivity()">
+                    <i class="fas fa-sync"></i> Refresh
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // Initialize Socket.IO connection
+        const socket = io();
+        let isListening = false;
+        let currentSession = null;
+
+        // Socket event handlers
+        socket.on('connect', function() {
+            console.log('Connected to Laura-bot server');
+            updateConnectionStatus(true);
+            showNotification('Connected to Laura-bot server', 'success');
+            addActivity('Connected to server', 'fas fa-wifi');
+            
+            // Request initial system status
+            socket.emit('hardware_status_request');
+            socket.emit('system_monitoring_request');
+        });
+
+        socket.on('disconnect', function() {
+            console.log('Disconnected from server');
+            updateConnectionStatus(false);
+            showNotification('Disconnected from server', 'error');
+            addActivity('Disconnected from server', 'fas fa-wifi-slash');
+        });
+
+        socket.on('welcome_message', function(data) {
+            console.log('Welcome message:', data);
+            showNotification(data.message, 'info');
+            data.features.forEach(feature => {
+                addActivity(`Feature available: ${feature}`, 'fas fa-check');
+            });
+        });
+
+        socket.on('hardware_status_update', function(data) {
+            updateHardwareDisplay(data);
+        });
+
+        socket.on('live_progress_update', function(data) {
+            updateLiveProgress(data);
+        });
+
+        socket.on('voice_command_response', function(data) {
+            handleVoiceResponse(data);
+        });
+
+        socket.on('gesture_response', function(data) {
+            handleGestureResponse(data);
+        });
+
+        socket.on('system_metrics_update', function(data) {
+            updateSystemMetrics(data);
+        });
+
+        socket.on('voice_activity', function(data) {
+            addActivity(`Voice: "${data.command}"`, 'fas fa-microphone');
+        });
+
+        socket.on('gesture_activity', function(data) {
+            addActivity(`Gesture: ${data.gesture} (${data.confidence}%)`, 'fas fa-hand-paper');
+        });
+
+        socket.on('status_update', function(data) {
+            console.log('Status update received:', data);
+            updateDashboardStatus(data);
+        });
+
+        socket.on('voice_result', function(data) {
+            if (data.error) {
+                showResponse('voice-response', `Error: ${data.error}`, 'error');
+            } else {
+                document.getElementById('last-command').textContent = data.transcription || 'Voice command';
+                document.getElementById('last-response').textContent = data.response || 'Processing...';
+                showResponse('voice-response', `Command: "${data.transcription}"<br>Response: ${data.response}`, 'success');
+                addActivity(`Voice command: ${data.transcription}`, 'fas fa-microphone');
+            }
+            isListening = false;
+            updateVoiceButton();
+        });
+
+        // Utility Functions
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function showResponse(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const color = type === 'error' ? '#ff6b6b' : type === 'success' ? '#51cf66' : '#74c0fc';
+            element.innerHTML = `<div style="color: ${color};">${message}</div>`;
+            element.style.display = 'block';
+            setTimeout(() => element.style.display = 'none', 5000);
+        }
+
+        function addActivity(message, icon = 'fas fa-info-circle') {
+            const activityLog = document.getElementById('activity-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const activityItem = document.createElement('div');
+            activityItem.className = 'activity-item';
+            activityItem.innerHTML = `<i class="${icon}"></i> ${message} <small style="float: right; opacity: 0.7;">${timestamp}</small>`;
+            activityLog.insertBefore(activityItem, activityLog.firstChild);
+            
+            // Keep only last 10 activities
+            if (activityLog.children.length > 10) {
+                activityLog.removeChild(activityLog.lastChild);
+            }
+        }
+
+        function updateConnectionStatus(connected) {
+            const statusElement = document.getElementById('connection-status');
+            if (connected) {
+                statusElement.className = 'status-item status-online';
+                statusElement.innerHTML = '<i class="fas fa-wifi"></i><span>Connection: Active</span>';
+            } else {
+                statusElement.className = 'status-item status-offline';
+                statusElement.innerHTML = '<i class="fas fa-wifi-slash"></i><span>Connection: Lost</span>';
+            }
+        }
+
+        // Real-time update functions
+        function updateHardwareDisplay(data) {
+            if (data.arduino) {
+                addActivity(`Arduino: ${data.arduino.mode} mode - ${data.arduino.temperature}°C`, 'fas fa-microchip');
+            }
+            
+            if (data.servo_motors) {
+                const servo1 = data.servo_motors.servo1;
+                const servo2 = data.servo_motors.servo2;
+                addActivity(`Servos - 1: ${servo1.position}° | 2: ${servo2.position}°`, 'fas fa-cog');
+            }
+        }
+
+        function updateLiveProgress(data) {
+            addActivity(`${data.subject}: ${data.score}% (${data.questions_answered} questions)`, 'fas fa-chart-line');
+            
+            // Update any progress displays
+            const progressBar = document.querySelector('.progress-fill');
+            if (progressBar) {
+                progressBar.style.width = data.score + '%';
+            }
+        }
+
+        function handleVoiceResponse(data) {
+            switch (data.action) {
+                case 'quiz_started':
+                    showNotification('Quiz session started!', 'success');
+                    break;
+                case 'next_question':
+                    showNotification('Moving to next question...', 'info');
+                    break;
+                case 'unknown_command':
+                    showNotification(`Unknown command: ${data.command}`, 'warning');
+                    break;
+                default:
+                    showNotification(data.message, 'info');
+            }
+            
+            addActivity(`Voice: "${data.command}" (${data.confidence}%)`, 'fas fa-microphone');
+        }
+
+        function handleGestureResponse(data) {
+            switch (data.action) {
+                case 'positive_feedback':
+                    showNotification('Great job! Keep it up!', 'success');
+                    break;
+                case 'pause_session':
+                    showNotification('Session paused', 'warning');
+                    break;
+                case 'help_request':
+                    showNotification('How can I help you?', 'info');
+                    break;
+                default:
+                    showNotification(data.message, 'info');
+            }
+            
+            addActivity(`Gesture: ${data.gesture} (${data.confidence}%)`, 'fas fa-hand-paper');
+        }
+
+        function updateSystemMetrics(data) {
+            addActivity(`System: CPU ${data.cpu_usage}% | Memory ${data.memory_usage}% | ${data.active_sessions} sessions`, 'fas fa-server');
+        }
+
+        function updateDashboardStatus(data) {
+            // Update various status indicators based on received data
+            if (data.learning_mode) {
+                const learningStatus = document.getElementById('learning-status');
+                learningStatus.innerHTML = `<i class="fas fa-graduation-cap"></i><span>Learning: ${data.learning_mode}</span>`;
+                learningStatus.className = data.learning_mode === 'active' ? 'status-item status-active' : 'status-item status-online';
+            }
+        }
+
+        function updateVoiceButton() {
+            const btn = document.getElementById('voice-btn');
+            if (isListening) {
+                btn.innerHTML = '<i class="fas fa-stop"></i> Stop Listening';
+                btn.className = 'btn btn-danger';
+            } else {
+                btn.innerHTML = '<i class="fas fa-microphone"></i> Start Listening';
+                btn.className = 'btn';
+            }
+        }
+
+        // Learning Functions
+        function startLearningSession() {
+            fetch('/api/start_session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_name: 'Student' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentSession = data.session_id;
+                    showResponse('learning-response', `Learning session started!<br>Session ID: ${data.session_id}`, 'success');
+                    addActivity('Learning session started', 'fas fa-play');
+                    showNotification('Learning session started!', 'success');
+                } else {
+                    showResponse('learning-response', `Error: ${data.error}`, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showResponse('learning-response', 'Failed to start session', 'error');
+            });
+        }
+
+        function selectSubject(subject) {
+            showResponse('learning-response', `Subject selected: ${subject}<br>Loading curriculum and resources...`, 'info');
+            addActivity(`Selected subject: ${subject}`, 'fas fa-book');
+            
+            // Update session with subject
+            if (currentSession) {
+                fetch('/api/update_session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: currentSession, subject: subject })
+                })
+                .then(response => response.json())
+                .then(data => console.log('Session updated:', data));
+            }
+        }
+
+        function generateQuiz() {
+            showResponse('quiz-response', 'Generating personalized quiz questions...', 'info');
+            addActivity('Quiz generation started', 'fas fa-question');
+            
+            fetch('/api/generate_quiz', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    subject: 'Mathematics', 
+                    difficulty: 1,
+                    num_questions: 5 
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showResponse('quiz-response', `Quiz generated successfully!<br>${data.quiz.questions.length} questions ready`, 'success');
+                    addActivity(`Quiz generated: ${data.quiz.questions.length} questions`, 'fas fa-check');
+                } else {
+                    showResponse('quiz-response', `Error: ${data.error}`, 'error');
+                }
+            });
+        }
+
+        function takeQuiz() {
+            window.open('/learn', '_blank');
+            addActivity('Opened quiz interface', 'fas fa-external-link-alt');
+        }
+
+        // Hardware Functions
+        function testArduino() {
+            showResponse('hardware-response', 'Testing Arduino connection and servo systems...', 'info');
+            addActivity('Arduino hardware test initiated', 'fas fa-microchip');
+            
+            fetch('/api/hardware_control', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'test_servo' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showResponse('hardware-response', `Hardware test completed!<br>${data.result}`, 'success');
+                    addActivity('Arduino test completed successfully', 'fas fa-check');
+                } else {
+                    showResponse('hardware-response', `Error: ${data.error}`, 'error');
+                }
+            });
+        }
+
+        function testVoice() {
+            showResponse('hardware-response', 'Testing voice synthesis system...', 'info');
+            addActivity('Voice system test initiated', 'fas fa-volume-up');
+            
+            fetch('/api/hardware_control', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'voice' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showResponse('hardware-response', 'Voice test completed successfully!', 'success');
+                    addActivity('Voice test completed', 'fas fa-check');
+                } else {
+                    showResponse('hardware-response', `Error: ${data.error}`, 'error');
+                }
+            });
+        }
+
+        function gestureControl() {
+            showResponse('hardware-response', 'Activating gesture recognition system...', 'info');
+            addActivity('Gesture control activated', 'fas fa-hand-paper');
+            
+            fetch('/api/hardware_control', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'gesture' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showResponse('hardware-response', `Gesture control updated!<br>${data.result}`, 'success');
+                    addActivity('Gesture recognition toggled', 'fas fa-hand-paper');
+                } else {
+                    showResponse('hardware-response', `Error: ${data.error}`, 'error');
+                }
+            });
+        }
+
+        function servoTest() {
+            showResponse('hardware-response', 'Testing servo motor movements and animations...', 'info');
+            addActivity('Servo test sequence started', 'fas fa-cog');
+        }
+
+        // Voice Functions
+        function startListening() {
+            if (isListening) {
+                isListening = false;
+                updateVoiceButton();
+                showResponse('voice-response', 'Stopped listening', 'info');
+                return;
+            }
+
+            isListening = true;
+            updateVoiceButton();
+            showResponse('voice-response', 'Listening for voice commands...', 'info');
+            addActivity('Started voice listening', 'fas fa-microphone');
+            
+            fetch('/api/voice_interaction', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'start_listening' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    showResponse('voice-response', `Error: ${data.error}`, 'error');
+                    isListening = false;
+                    updateVoiceButton();
+                }
+            });
+        }
+
+        function speakStatus() {
+            fetch('/api/hardware_control', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'speak' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showResponse('voice-response', 'Status announcement completed', 'success');
+                    addActivity('Status announced via voice', 'fas fa-volume-up');
+                } else {
+                    showResponse('voice-response', `Error: ${data.error}`, 'error');
+                }
+            });
+        }
+
+        // Progress Functions
+        function viewProgress() {
+            window.open('/progress', '_blank');
+            addActivity('Opened progress analytics', 'fas fa-chart-line');
+        }
+
+        function exportProgress() {
+            showResponse('progress-response', 'Generating progress report...', 'info');
+            addActivity('Progress data export initiated', 'fas fa-download');
+            
+            // Simulate export process
+            setTimeout(() => {
+                showResponse('progress-response', 'Progress data exported successfully!', 'success');
+                addActivity('Progress data exported', 'fas fa-check');
+            }, 2000);
+        }
+
+        // Activity Functions
+        function clearActivity() {
+            document.getElementById('activity-log').innerHTML = '<div class="activity-item"><i class="fas fa-info-circle"></i> Activity log cleared</div>';
+            showNotification('Activity log cleared', 'info');
+        }
+
+        function refreshActivity() {
+            addActivity('Activity log refreshed', 'fas fa-sync');
+            showNotification('Activity refreshed', 'info');
+        }
+
+        function continueLearning() {
+            if (currentSession) {
+                showResponse('learning-response', 'Continuing previous learning session...', 'info');
+                addActivity('Resumed learning session', 'fas fa-play');
+            } else {
+                showResponse('learning-response', 'No active session. Please start a new session.', 'info');
+            }
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Laura-bot Dashboard initialized');
+            addActivity('Dashboard loaded successfully', 'fas fa-check');
+            
+            // Fetch initial status
+            fetch('/api/status')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Initial status:', data);
+                    if (data.success) {
+                        addActivity('System status loaded', 'fas fa-info-circle');
+                    }
+                })
+                .catch(error => console.error('Status fetch error:', error));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laura-bot - AI Educational Platform</title>
+    
+    <!-- Preload Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Modern UI Framework -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-ui.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Real-time Communication -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.js"></script>
+    
+    <!-- Advanced Chart Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js"></script>
+    
+    <!-- Progressive Web App -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#667eea">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+</head>
+<body>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="nav-content">
+            <a href="/" class="nav-brand">
+                <div class="logo">🤖</div>
+                Laura-bot
+            </a>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/" class="nav-link active">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/learn" class="nav-link">
+                        <i class="fas fa-graduation-cap"></i> Learn
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/quiz" class="nav-link">
+                        <i class="fas fa-brain"></i> Quiz
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/progress" class="nav-link">
+                        <i class="fas fa-chart-line"></i> Progress
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/hardware" class="nav-link">
+                        <i class="fas fa-microchip"></i> Hardware
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="nav-actions">
+                <div class="status-indicator online">
+                    <span>Online</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <h1 class="hero-title">Welcome to Laura-bot</h1>
+            <p class="hero-subtitle">Your intelligent AI-powered educational companion designed to enhance learning through personalized experiences</p>
+        </section>
+
+        <!-- Quick Stats -->
+        <section class="stats-grid">
+            <div class="stat-card glass">
+                <div class="stat-value" id="total-sessions">12</div>
+                <div class="stat-label">Learning Sessions</div>
+            </div>
+            <div class="stat-card glass">
+                <div class="stat-value" id="study-hours">24.5</div>
+                <div class="stat-label">Hours Studied</div>
+            </div>
+            <div class="stat-card glass">
+                <div class="stat-value" id="avg-score">87%</div>
+                <div class="stat-label">Average Score</div>
+            </div>
+            <div class="stat-card glass">
+                <div class="stat-value" id="streak-days">7</div>
+                <div class="stat-label">Day Streak</div>
+            </div>
+        </section>
+
+        <!-- Feature Cards -->
+        <section class="card-grid">
+            <!-- Interactive Learning Card -->
+            <div class="modern-card" onclick="navigateTo('/learn')">
+                <div class="card-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h3 class="card-title">Interactive Learning</h3>
+                <p class="card-description">
+                    Personalized AI-powered lessons with adaptive content, real-time feedback, and voice interaction capabilities.
+                </p>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 73%"></div>
+                    </div>
+                    <small style="color: rgba(255,255,255,0.7);">Current Progress: 73%</small>
+                </div>
+                <a href="/learn" class="card-link">Start Learning</a>
+            </div>
+
+            <!-- Quiz System Card -->
+            <div class="modern-card" onclick="navigateTo('/quiz')">
+                <div class="card-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3 class="card-title">Intelligent Quiz System</h3>
+                <p class="card-description">
+                    Adaptive quizzes with voice control, real-time scoring, and personalized difficulty adjustment.
+                </p>
+                <div class="quiz-stats">
+                    <div class="flex-between" style="margin: 10px 0;">
+                        <span>Recent Score:</span>
+                        <span style="color: #4caf50; font-weight: 600;">92%</span>
+                    </div>
+                    <div class="flex-between">
+                        <span>Quizzes Completed:</span>
+                        <span style="color: #2196f3; font-weight: 600;">15</span>
+                    </div>
+                </div>
+                <a href="/quiz" class="card-link">Take Quiz</a>
+            </div>
+
+            <!-- Progress Analytics Card -->
+            <div class="modern-card" onclick="navigateTo('/progress')">
+                <div class="card-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="card-title">Learning Analytics</h3>
+                <p class="card-description">
+                    Comprehensive progress tracking with detailed insights, performance trends, and achievement system.
+                </p>
+                <div class="mini-chart">
+                    <canvas id="progressChart" width="280" height="120"></canvas>
+                </div>
+                <a href="/progress" class="card-link">View Analytics</a>
+            </div>
+
+            <!-- Hardware Control Card -->
+            <div class="modern-card" onclick="navigateTo('/hardware')">
+                <div class="card-icon">
+                    <i class="fas fa-microchip"></i>
+                </div>
+                <h3 class="card-title">Hardware Integration</h3>
+                <p class="card-description">
+                    Arduino control, IoT sensors, gesture recognition, and real-time hardware monitoring system.
+                </p>
+                <div class="hardware-status">
+                    <div class="flex-between" style="margin: 8px 0;">
+                        <span><i class="fas fa-microchip"></i> Arduino:</span>
+                        <span class="status-indicator online" style="font-size: 0.8em; padding: 2px 8px;">Connected</span>
+                    </div>
+                    <div class="flex-between" style="margin: 8px 0;">
+                        <span><i class="fas fa-hand-paper"></i> Gestures:</span>
+                        <span style="color: #ff9800;">Ready</span>
+                    </div>
+                    <div class="flex-between">
+                        <span><i class="fas fa-volume-up"></i> Voice:</span>
+                        <span style="color: #4caf50;">Active</span>
+                    </div>
+                </div>
+                <a href="/hardware" class="card-link">Control Hardware</a>
+            </div>
+
+            <!-- Voice Assistant Card -->
+            <div class="modern-card">
+                <div class="card-icon">
+                    <i class="fas fa-microphone"></i>
+                </div>
+                <h3 class="card-title">AI Voice Assistant</h3>
+                <p class="card-description">
+                    Natural language interaction with speech recognition, AI responses, and voice-controlled navigation.
+                </p>
+                <div class="voice-controls">
+                    <button class="btn btn-primary" id="voice-toggle">
+                        <i class="fas fa-microphone"></i> Start Listening
+                    </button>
+                    <div class="voice-status" id="voice-status">Ready to listen...</div>
+                </div>
+            </div>
+
+            <!-- Recent Activity Card -->
+            <div class="modern-card">
+                <div class="card-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3 class="card-title">Recent Activity</h3>
+                <p class="card-description">
+                    Track your latest learning sessions, quiz results, and system interactions.
+                </p>
+                <div class="activity-list" id="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon"><i class="fas fa-graduation-cap"></i></div>
+                        <div class="activity-content">
+                            <div class="activity-title">Completed Math Lesson</div>
+                            <div class="activity-time">2 hours ago</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon"><i class="fas fa-brain" style="color: #4caf50;"></i></div>
+                        <div class="activity-content">
+                            <div class="activity-title">Science Quiz - Score: 94%</div>
+                            <div class="activity-time">5 hours ago</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon"><i class="fas fa-microchip" style="color: #ff9800;"></i></div>
+                        <div class="activity-content">
+                            <div class="activity-title">Hardware Configuration</div>
+                            <div class="activity-time">1 day ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Actions Panel -->
+        <section class="glass" style="padding: 2rem; margin-top: 2rem; border-radius: 24px;">
+            <h2 style="margin-bottom: 1.5rem; font-family: var(--font-display);">
+                <i class="fas fa-bolt" style="color: #ffeb3b;"></i>
+                Quick Actions
+            </h2>
+            <div class="flex" style="gap: 1rem; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="startQuickLesson()">
+                    <i class="fas fa-play"></i> Quick Lesson
+                </button>
+                <button class="btn btn-secondary" onclick="startVoiceMode()">
+                    <i class="fas fa-microphone"></i> Voice Mode
+                </button>
+                <button class="btn btn-secondary" onclick="showProgress()">
+                    <i class="fas fa-chart-bar"></i> View Progress
+                </button>
+                <button class="btn btn-secondary" onclick="openHardwarePanel()">
+                    <i class="fas fa-cogs"></i> Hardware Panel
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Additional Styles for Enhanced UI -->
+    <style>
+        /* Activity List Styles */
+        .activity-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition-fast);
+        }
+
+        .activity-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding-left: 0.5rem;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Voice Controls */
+        .voice-controls {
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .voice-status {
+            margin-top: 0.75rem;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Mini Chart Container */
+        .mini-chart {
+            margin: 1rem 0;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Hardware Status */
+        .hardware-status {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+
+        /* Quiz Stats */
+        .quiz-stats {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+
+        /* Enhanced Navigation */
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+        }
+    </style>
+
+    <!-- Enhanced JavaScript -->
+    <script>
+        // Initialize Socket.IO
+        const socket = io();
+        
+        // Navigation function
+        function navigateTo(url) {
+            window.location.href = url;
+        }
+
+        // Initialize mini progress chart
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('progressChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: 'Progress',
+                            data: [65, 72, 78, 85, 82, 89, 93],
+                            borderColor: '#4facfe',
+                            backgroundColor: 'rgba(79, 172, 254, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                display: false
+                            },
+                            y: {
+                                display: false
+                            }
+                        },
+                        elements: {
+                            point: {
+                                radius: 0
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        // Voice functionality
+        let isListening = false;
+        const voiceToggle = document.getElementById('voice-toggle');
+        const voiceStatus = document.getElementById('voice-status');
+
+        function startVoiceMode() {
+            if (!isListening) {
+                isListening = true;
+                voiceToggle.innerHTML = '<i class="fas fa-stop"></i> Stop Listening';
+                voiceToggle.classList.add('btn-secondary');
+                voiceToggle.classList.remove('btn-primary');
+                voiceStatus.textContent = 'Listening... Speak now!';
+                voiceStatus.style.color = '#4caf50';
+                
+                // Emit voice start event
+                socket.emit('voice_start');
+                
+                // Auto-stop after 30 seconds
+                setTimeout(() => {
+                    if (isListening) {
+                        stopVoiceMode();
+                    }
+                }, 30000);
+            } else {
+                stopVoiceMode();
+            }
+        }
+
+        function stopVoiceMode() {
+            isListening = false;
+            voiceToggle.innerHTML = '<i class="fas fa-microphone"></i> Start Listening';
+            voiceToggle.classList.add('btn-primary');
+            voiceToggle.classList.remove('btn-secondary');
+            voiceStatus.textContent = 'Ready to listen...';
+            voiceStatus.style.color = 'rgba(255,255,255,0.8)';
+            
+            socket.emit('voice_stop');
+        }
+
+        voiceToggle.addEventListener('click', startVoiceMode);
+
+        // Quick action functions
+        function startQuickLesson() {
+            window.location.href = '/learn?quick=true';
+        }
+
+        function showProgress() {
+            window.location.href = '/progress';
+        }
+
+        function openHardwarePanel() {
+            window.location.href = '/hardware';
+        }
+
+        // Socket.IO event handlers
+        socket.on('connect', function() {
+            console.log('Connected to Laura-bot server');
+            updateConnectionStatus(true);
+        });
+
+        socket.on('disconnect', function() {
+            console.log('Disconnected from server');
+            updateConnectionStatus(false);
+        });
+
+        socket.on('stats_update', function(data) {
+            updateStats(data);
+        });
+
+        socket.on('activity_update', function(activity) {
+            addActivity(activity);
+        });
+
+        socket.on('voice_response', function(data) {
+            if (data.message) {
+                voiceStatus.textContent = data.message;
+            }
+        });
+
+        // Helper functions
+        function updateConnectionStatus(connected) {
+            const indicator = document.querySelector('.status-indicator');
+            if (connected) {
+                indicator.className = 'status-indicator online';
+                indicator.innerHTML = '<span>Online</span>';
+            } else {
+                indicator.className = 'status-indicator offline';
+                indicator.innerHTML = '<span>Offline</span>';
+                indicator.style.background = 'rgba(244, 67, 54, 0.2)';
+                indicator.style.color = '#f44336';
+            }
+        }
+
+        function updateStats(data) {
+            if (data.sessions) document.getElementById('total-sessions').textContent = data.sessions;
+            if (data.hours) document.getElementById('study-hours').textContent = data.hours;
+            if (data.score) document.getElementById('avg-score').textContent = data.score + '%';
+            if (data.streak) document.getElementById('streak-days').textContent = data.streak;
+        }
+
+        function addActivity(activity) {
+            const activityList = document.getElementById('activity-list');
+            const activityItem = document.createElement('div');
+            activityItem.className = 'activity-item';
+            activityItem.innerHTML = `
+                <div class="activity-icon">
+                    <i class="${activity.icon || 'fas fa-info-circle'}"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">${activity.title}</div>
+                    <div class="activity-time">${activity.time || 'Just now'}</div>
+                </div>
+            `;
+            
+            activityList.insertBefore(activityItem, activityList.firstChild);
+            
+            // Keep only latest 5 activities
+            while (activityList.children.length > 5) {
+                activityList.removeChild(activityList.lastChild);
+            }
+        }
+
+        // Initialize fade-in animations
+        function initAnimations() {
+            const elements = document.querySelectorAll('.modern-card, .stat-card');
+            elements.forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                setTimeout(() => {
+                    el.style.transition = 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            initAnimations();
+            
+            // Request initial stats
+            socket.emit('request_stats');
+        });
+
+        // Auto-refresh stats every 30 seconds
+        setInterval(() => {
+            socket.emit('request_stats');
+        }, 30000);
+    </script>
+</body>
+</html>

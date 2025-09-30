@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Learning - Laura-bot</title>
+    
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- UI Framework -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-ui.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Real-time -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.js"></script>
+    
+    <!-- Math Rendering -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+</head>
+<body>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="nav-content">
+            <a href="/" class="nav-brand">
+                <div class="logo">🤖</div>
+                Laura-bot
+            </a>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/" class="nav-link">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/learn" class="nav-link active">
+                        <i class="fas fa-graduation-cap"></i> Learn
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/quiz" class="nav-link">
+                        <i class="fas fa-brain"></i> Quiz
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/progress" class="nav-link">
+                        <i class="fas fa-chart-line"></i> Progress
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="nav-actions">
+                <div class="status-indicator online">
+                    <span>AI Ready</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <!-- Learning Header -->
+        <section class="hero-section">
+            <h1 class="hero-title">Interactive Learning Studio</h1>
+            <p class="hero-subtitle">AI-powered personalized education with adaptive content and real-time feedback</p>
+        </section>
+
+        <!-- Learning Dashboard -->
+        <div class="learning-layout">
+            <!-- Subject Selection Sidebar -->
+            <aside class="learning-sidebar glass">
+                <h3 class="sidebar-title">
+                    <i class="fas fa-books"></i> Subjects
+                </h3>
+                
+                <div class="subject-list">
+                    <button class="subject-btn active" data-subject="mathematics">
+                        <div class="subject-icon">📊</div>
+                        <div class="subject-info">
+                            <div class="subject-name">Mathematics</div>
+                            <div class="subject-progress">Progress: 73%</div>
+                        </div>
+                    </button>
+                    
+                    <button class="subject-btn" data-subject="science">
+                        <div class="subject-icon">🔬</div>
+                        <div class="subject-info">
+                            <div class="subject-name">Science</div>
+                            <div class="subject-progress">Progress: 68%</div>
+                        </div>
+                    </button>
+                    
+                    <button class="subject-btn" data-subject="history">
+                        <div class="subject-icon">🏛️</div>
+                        <div class="subject-info">
+                            <div class="subject-name">History</div>
+                            <div class="subject-progress">Progress: 82%</div>
+                        </div>
+                    </button>
+                    
+                    <button class="subject-btn" data-subject="language">
+                        <div class="subject-icon">🗣️</div>
+                        <div class="subject-info">
+                            <div class="subject-name">Language Arts</div>
+                            <div class="subject-progress">Progress: 91%</div>
+                        </div>
+                    </button>
+                    
+                    <button class="subject-btn" data-subject="coding">
+                        <div class="subject-icon">💻</div>
+                        <div class="subject-info">
+                            <div class="subject-name">Programming</div>
+                            <div class="subject-progress">Progress: 56%</div>
+                        </div>
+                    </button>
+                </div>
+
+                <div class="learning-tools">
+                    <h4>Learning Tools</h4>
+                    <button class="tool-btn" id="voice-assistant">
+                        <i class="fas fa-microphone"></i> Voice Assistant
+                    </button>
+                    <button class="tool-btn" id="ai-tutor">
+                        <i class="fas fa-robot"></i> AI Tutor
+                    </button>
+                    <button class="tool-btn" id="study-mode">
+                        <i class="fas fa-focus"></i> Focus Mode
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main Learning Area -->
+            <div class="learning-main">
+                <!-- Current Lesson Panel -->
+                <section class="lesson-panel glass">
+                    <div class="lesson-header">
+                        <div class="lesson-title">
+                            <h2 id="lesson-title">Quadratic Equations</h2>
+                            <div class="lesson-meta">
+                                <span class="difficulty-badge intermediate">Intermediate</span>
+                                <span class="duration">~25 min</span>
+                            </div>
+                        </div>
+                        
+                        <div class="lesson-controls">
+                            <button class="btn btn-secondary" id="prev-lesson">
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </button>
+                            <button class="btn btn-primary" id="next-lesson">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="lesson-progress-bar">
+                        <div class="progress-track">
+                            <div class="progress-fill" id="lesson-progress"></div>
+                        </div>
+                        <span class="progress-text">3 of 8 sections completed</span>
+                    </div>
+
+                    <!-- Lesson Content -->
+                    <div class="lesson-content" id="lesson-content">
+                        <div class="content-section active">
+                            <h3>Understanding Quadratic Equations</h3>
+                            <p>A quadratic equation is a polynomial equation of degree 2. The general form is:</p>
+                            
+                            <div class="math-formula">
+                                $$ax^2 + bx + c = 0$$
+                            </div>
+                            
+                            <p>Where <strong>a</strong>, <strong>b</strong>, and <strong>c</strong> are constants, and <strong>a ≠ 0</strong>.</p>
+                            
+                            <div class="interactive-example">
+                                <h4>Interactive Example</h4>
+                                <div class="example-controls">
+                                    <label>
+                                        a = <input type="range" id="param-a" min="-5" max="5" value="1" step="0.1">
+                                        <span id="value-a">1</span>
+                                    </label>
+                                    <label>
+                                        b = <input type="range" id="param-b" min="-10" max="10" value="0" step="0.1">
+                                        <span id="value-b">0</span>
+                                    </label>
+                                    <label>
+                                        c = <input type="range" id="param-c" min="-10" max="10" value="0" step="0.1">
+                                        <span id="value-c">0</span>
+                                    </label>
+                                </div>
+                                <div class="graph-container">
+                                    <canvas id="quadratic-graph" width="400" height="300"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lesson Actions -->
+                    <div class="lesson-actions">
+                        <button class="btn btn-secondary" id="practice-btn">
+                            <i class="fas fa-dumbbell"></i> Practice Problems
+                        </button>
+                        <button class="btn btn-primary" id="understand-btn">
+                            <i class="fas fa-lightbulb"></i> I Understand
+                        </button>
+                        <button class="btn btn-secondary" id="help-btn">
+                            <i class="fas fa-question-circle"></i> Need Help
+                        </button>
+                    </div>
+                </section>
+
+                <!-- AI Assistant Panel -->
+                <section class="ai-panel glass">
+                    <div class="ai-header">
+                        <div class="ai-avatar">
+                            <div class="avatar-icon">🤖</div>
+                            <div class="ai-status online"></div>
+                        </div>
+                        <div class="ai-info">
+                            <h3>Laura AI Tutor</h3>
+                            <p>Ready to help you learn</p>
+                        </div>
+                        <button class="btn btn-secondary btn-sm" id="clear-chat">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+
+                    <div class="ai-chat" id="ai-chat">
+                        <div class="chat-message ai-message">
+                            <div class="message-content">
+                                <p>Hello! I'm Laura, your AI learning assistant. I can help explain concepts, answer questions, and provide personalized guidance. What would you like to learn about today?</p>
+                            </div>
+                            <div class="message-time">Just now</div>
+                        </div>
+                    </div>
+
+                    <div class="ai-input-area">
+                        <div class="input-container">
+                            <input type="text" id="ai-input" placeholder="Ask me anything about this lesson..." class="form-input">
+                            <button class="btn btn-primary" id="send-message">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div class="voice-controls">
+                            <button class="btn btn-secondary btn-sm" id="voice-input">
+                                <i class="fas fa-microphone"></i> Voice
+                            </button>
+                            <button class="btn btn-secondary btn-sm" id="camera-input">
+                                <i class="fas fa-camera"></i> Photo
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Progress Sidebar -->
+            <aside class="progress-sidebar glass">
+                <h3 class="sidebar-title">
+                    <i class="fas fa-chart-line"></i> Your Progress
+                </h3>
+                
+                <div class="progress-stats">
+                    <div class="stat-item">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-details">
+                            <div class="stat-value">73%</div>
+                            <div class="stat-label">Overall Progress</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-details">
+                            <div class="stat-value">8/12</div>
+                            <div class="stat-label">Lessons Complete</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-icon">⏱️</div>
+                        <div class="stat-details">
+                            <div class="stat-value">2.5h</div>
+                            <div class="stat-label">Study Time</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="achievements">
+                    <h4>Recent Achievements</h4>
+                    <div class="achievement-list">
+                        <div class="achievement-item">
+                            <div class="achievement-icon">🏆</div>
+                            <div class="achievement-text">Quick Learner</div>
+                        </div>
+                        <div class="achievement-item">
+                            <div class="achievement-icon">🔥</div>
+                            <div class="achievement-text">7 Day Streak</div>
+                        </div>
+                        <div class="achievement-item">
+                            <div class="achievement-icon">⭐</div>
+                            <div class="achievement-text">Perfect Score</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="study-goals">
+                    <h4>Study Goals</h4>
+                    <div class="goal-item">
+                        <div class="goal-text">Complete 5 lessons this week</div>
+                        <div class="goal-progress">
+                            <div class="progress-bar small">
+                                <div class="progress-fill"></div>
+                            </div>
+                            <span>3/5</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Enhanced Styles -->
+    <style>
+        .learning-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr 280px;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .learning-sidebar, .progress-sidebar {
+            padding: 1.5rem;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .learning-main {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .sidebar-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-family: var(--font-display);
+            font-weight: 600;
+        }
+
+        /* Subject Selection */
+        .subject-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .subject-btn {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transition-normal);
+        }
+
+        .subject-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(4px);
+        }
+
+        .subject-btn.active {
+            background: var(--accent-gradient);
+            border-color: transparent;
+            box-shadow: 0 4px 16px rgba(79, 172, 254, 0.4);
+        }
+
+        .subject-icon {
+            font-size: 1.5rem;
+        }
+
+        .subject-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .subject-progress {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+
+        /* Learning Tools */
+        .learning-tools {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1.5rem;
+        }
+
+        .learning-tools h4 {
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.8;
+        }
+
+        .tool-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition-normal);
+        }
+
+        .tool-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Lesson Panel */
+        .lesson-panel {
+            padding: 2rem;
+        }
+
+        .lesson-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .lesson-title h2 {
+            font-family: var(--font-display);
+            margin-bottom: 0.5rem;
+        }
+
+        .lesson-meta {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .difficulty-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .difficulty-badge.intermediate {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+        }
+
+        .duration {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.875rem;
+        }
+
+        .lesson-progress-bar {
+            margin-bottom: 2rem;
+        }
+
+        .progress-track {
+            background: rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-track .progress-fill {
+            height: 100%;
+            background: var(--accent-gradient);
+            width: 37.5%;
+            transition: width var(--transition-slow);
+        }
+
+        .progress-text {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Lesson Content */
+        .lesson-content {
+            margin-bottom: 2rem;
+        }
+
+        .content-section h3 {
+            margin-bottom: 1rem;
+            font-family: var(--font-display);
+        }
+
+        .content-section p {
+            margin-bottom: 1rem;
+            line-height: 1.7;
+        }
+
+        .math-formula {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            margin: 1.5rem 0;
+            font-size: 1.25rem;
+        }
+
+        .interactive-example {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+        }
+
+        .example-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .example-controls label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .example-controls input[type="range"] {
+            width: 100px;
+        }
+
+        .graph-container {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .lesson-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* AI Panel */
+        .ai-panel {
+            padding: 1.5rem;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .ai-avatar {
+            position: relative;
+        }
+
+        .avatar-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--accent-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .ai-status {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: #4caf50;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .ai-info h3 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .ai-info p {
+            margin: 0;
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+
+        .ai-chat {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            padding-right: 0.5rem;
+        }
+
+        .chat-message {
+            margin-bottom: 1rem;
+        }
+
+        .ai-message .message-content {
+            background: rgba(79, 172, 254, 0.2);
+            padding: 1rem;
+            border-radius: 16px 16px 16px 4px;
+            margin-bottom: 0.25rem;
+        }
+
+        .user-message .message-content {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 16px 16px 4px 16px;
+            margin-bottom: 0.25rem;
+            margin-left: 2rem;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.6;
+            text-align: right;
+        }
+
+        .ai-input-area {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1rem;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .input-container .form-input {
+            flex: 1;
+        }
+
+        .voice-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Progress Sidebar */
+        .progress-stats {
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-icon {
+            font-size: 1.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #4facfe;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+
+        .achievements, .study-goals {
+            margin-bottom: 2rem;
+        }
+
+        .achievements h4, .study-goals h4 {
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.8;
+        }
+
+        .achievement-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+        }
+
+        .achievement-icon {
+            font-size: 1.25rem;
+        }
+
+        .goal-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+        }
+
+        .goal-progress {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .progress-bar.small {
+            height: 4px;
+            flex: 1;
+        }
+
+        .goal-progress span {
+            font-size: 0.875rem;
+            color: #4facfe;
+            font-weight: 600;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .learning-layout {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .learning-sidebar, .progress-sidebar {
+                position: static;
+                height: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .lesson-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .lesson-controls {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+            }
+            
+            .example-controls {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .ai-panel {
+                height: 400px;
+            }
+        }
+    </style>
+
+    <!-- Enhanced JavaScript -->
+    <script>
+        // Initialize Socket.IO
+        const socket = io();
+        
+        // Subject switching
+        document.querySelectorAll('.subject-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const subject = this.dataset.subject;
+                loadSubject(subject);
+                
+                socket.emit('subject_changed', { subject: subject });
+            });
+        });
+
+        // Interactive controls
+        const paramA = document.getElementById('param-a');
+        const paramB = document.getElementById('param-b');
+        const paramC = document.getElementById('param-c');
+        const valueA = document.getElementById('value-a');
+        const valueB = document.getElementById('value-b');
+        const valueC = document.getElementById('value-c');
+
+        function updateValues() {
+            valueA.textContent = paramA.value;
+            valueB.textContent = paramB.value;
+            valueC.textContent = paramC.value;
+            drawQuadratic();
+        }
+
+        paramA.addEventListener('input', updateValues);
+        paramB.addEventListener('input', updateValues);
+        paramC.addEventListener('input', updateValues);
+
+        // Graph drawing
+        function drawQuadratic() {
+            const canvas = document.getElementById('quadratic-graph');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            // Draw axes
+            ctx.strokeStyle = '#ccc';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(width/2, 0);
+            ctx.lineTo(width/2, height);
+            ctx.moveTo(0, height/2);
+            ctx.lineTo(width, height/2);
+            ctx.stroke();
+            
+            // Draw quadratic
+            const a = parseFloat(paramA.value);
+            const b = parseFloat(paramB.value);
+            const c = parseFloat(paramC.value);
+            
+            ctx.strokeStyle = '#4facfe';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            
+            for (let x = -10; x <= 10; x += 0.1) {
+                const y = a * x * x + b * x + c;
+                const canvasX = (x + 10) * width / 20;
+                const canvasY = height - ((y + 10) * height / 20);
+                
+                if (x === -10) {
+                    ctx.moveTo(canvasX, canvasY);
+                } else {
+                    ctx.lineTo(canvasX, canvasY);
+                }
+            }
+            ctx.stroke();
+        }
+
+        // AI Chat functionality
+        const aiInput = document.getElementById('ai-input');
+        const sendButton = document.getElementById('send-message');
+        const aiChat = document.getElementById('ai-chat');
+
+        function sendMessage() {
+            const message = aiInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addChatMessage(message, 'user');
+            aiInput.value = '';
+
+            // Send to AI
+            socket.emit('ai_question', { 
+                message: message, 
+                context: 'mathematics',
+                lesson: 'quadratic-equations'
+            });
+        }
+
+        function addChatMessage(content, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${sender}-message`;
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <p>${content}</p>
+                </div>
+                <div class="message-time">Just now</div>
+            `;
+            
+            aiChat.appendChild(messageDiv);
+            aiChat.scrollTop = aiChat.scrollHeight;
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+        aiInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Learning actions
+        document.getElementById('understand-btn').addEventListener('click', function() {
+            socket.emit('lesson_complete', { 
+                lesson: 'quadratic-equations',
+                understanding: 'good'
+            });
+            
+            addChatMessage("Great! I understand this concept well. What's next?", 'user');
+            
+            setTimeout(() => {
+                addChatMessage("Excellent! Let's move on to solving quadratic equations using the quadratic formula. This builds on what you just learned!", 'ai');
+            }, 1000);
+        });
+
+        document.getElementById('help-btn').addEventListener('click', function() {
+            addChatMessage("I need more help understanding this concept.", 'user');
+            
+            setTimeout(() => {
+                addChatMessage("No problem! Let me break this down further. A quadratic equation creates a parabola when graphed. Try adjusting the sliders above to see how each parameter affects the shape. What specific part would you like me to explain more?", 'ai');
+            }, 1000);
+        });
+
+        // Voice input
+        document.getElementById('voice-input').addEventListener('click', function() {
+            if ('speechRecognition' in window || 'webkitSpeechRecognition' in window) {
+                const recognition = new (window.speechRecognition || window.webkitSpeechRecognition)();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    aiInput.value = transcript;
+                    sendMessage();
+                };
+                
+                recognition.start();
+                this.innerHTML = '<i class="fas fa-stop"></i> Stop';
+                
+                recognition.onend = () => {
+                    this.innerHTML = '<i class="fas fa-microphone"></i> Voice';
+                };
+            } else {
+                alert('Speech recognition not supported in this browser');
+            }
+        });
+
+        // Socket.IO events
+        socket.on('ai_response', function(data) {
+            addChatMessage(data.message, 'ai');
+        });
+
+        socket.on('progress_update', function(data) {
+            updateProgress(data);
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            drawQuadratic();
+            
+            // MathJax configuration
+            window.MathJax = {
+                tex: {
+                    inlineMath: [['$', '$'], ['\\(', '\\)']],
+                    displayMath: [['$$', '$$'], ['\\[', '\\]']]
+                }
+            };
+        });
+
+        function loadSubject(subject) {
+            // Update lesson content based on subject
+            console.log('Loading subject:', subject);
+        }
+
+        function updateProgress(data) {
+            // Update progress indicators
+            console.log('Progress update:', data);
+        }
+    </script>
+</body>
+</html>

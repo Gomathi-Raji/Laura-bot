@@ -1,10 +1,24 @@
-import google.generativeai as genai
-
-# Replace this with your actual Gemini API key
-genai.configure(api_key="AIzaSyBif5c4kQOeJKpo-aRNQva86h1ldss_ggE")
-
-def get_model():
-    return genai.GenerativeModel("gemini-2.0-flash")
+try:
+    import google.generativeai as genai
+    GENAI_AVAILABLE = True
+    
+    # Replace this with your actual Gemini API key
+    genai.configure(api_key="AIzaSyDzPkc8K4nJI5606Dbl2D2PRtj2eM4zb2c")
+    
+    def get_model():
+        try:
+            return genai.GenerativeModel("gemini-2.5-flash")
+        except Exception as e:
+            print(f"⚠️ Gemini model error: {e}")
+            return None
+            
+except ImportError:
+    GENAI_AVAILABLE = False
+    print("⚠️ Google Generative AI not available. Install with: pip install google-generativeai")
+    
+    def get_model():
+        print("⚠️ Gemini AI not configured. Using fallback responses.")
+        return None
 
 # --- Spotify API Configuration ---
 # Get these credentials from https://developer.spotify.com/dashboard/

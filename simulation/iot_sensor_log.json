@@ -1,0 +1,348 @@
+{
+  "log_entries": [
+    {
+      "timestamp": "2025-09-28T17:54:22.493245",
+      "readings": [
+        {
+          "sensor_id": "temp_001",
+          "sensor_type": "temperature",
+          "value": 24.63,
+          "unit": "\u00b0C",
+          "timestamp": "2025-09-28T17:54:22.493245",
+          "status": "critical",
+          "location": "living_room"
+        },
+        {
+          "sensor_id": "temp_002",
+          "sensor_type": "temperature",
+          "value": 21.86,
+          "unit": "\u00b0C",
+          "timestamp": "2025-09-28T17:54:22.493245",
+          "status": "critical",
+          "location": "bedroom"
+        }
+      ],
+      "statistics": {
+        "total_sensors": 10,
+        "active_sensors": 10,
+        "total_readings": 2,
+        "total_alerts": 2,
+        "critical_alerts": 2,
+        "warning_alerts": 0,
+        "uptime": "Running"
+      }
+    },
+    {
+      "timestamp": "2025-09-28T17:54:52.505343",
+      "readings": [
+        {
+          "sensor_id": "temp_001",
+          "sensor_type": "temperature",
+          "value": 24.19,
+          "unit": "\u00b0C",
+          "timestamp": "2025-09-28T17:54:50.560293",
+          "status": "critical",
+          "location": "living_room"
+        },
+        {
+          "sensor_id": "temp_002",
+          "sensor_type": "temperature",
+          "value": 21.91,
+          "unit": "\u00b0C",
+          "timestamp": "2025-09-28T17:54:50.560293",
+          "status": "critical",
+          "location": "bedroom"
+        },
+        {
+          "sensor_id": "hum_001",
+          "sensor_type": "humidity",
+          "value": 55.24,
+          "unit": "%",
+          "timestamp": "2025-09-28T17:54:50.560293",
+          "status": "critical",
+          "location": "living_room"
+        },
+        {
+          "sensor_id": "hum_002",
+          "sensor_type": "humidity",
+          "value": 60.11,
+          "unit": "%",
+          "timestamp": "2025-09-28T17:54:50.560293",
+          "status": "critical",
+          "location": "bathroom"
+        },
+        {
+          "sensor_id": "air_001",
+          "sensor_type": "air_quality",
+          "value": 128.98,
+          "unit": "AQI",
+          "timestamp": "2025-09-28T17:54:50.560293",
+          "status": "critical",
+          "location": "living_room"
+        },
+        {
+          "sensor_id": "noise_001",
+          "sensor_type": "noise_level",
+          "value": 40.77,
+          "unit": "dB",
+          "timestamp": "2025-09-28T17:54:50.560293",
+          "status": "critical",
+          "location": "living_room"
+        },
+        {
+          "sensor_id": "light_001",
+          "sensor_type": "light_level",
+          "value": 455.9,
+          "unit": "lux",
+          "timestamp": "2025-09-28T17:54:50.560293",
+          "status": "critical",
+          "location": "living_room"
+        },
+        {
+          "sensor_id": "motion_001",
+          "sensor_type": "motion_intensity",
+          "value": 3.84,
+          "unit": "scale",
+          "timestamp": "2025-09-28T17:54:50.560293",
+          "status": "critical",
+          "location": "entrance"
+        },
+        {
+          "sensor_id": "gas_001",
+          "sensor_type": "gas_level",
+          "value": 8.88,
+          "unit": "ppm",
+          "timestamp": "2025-09-28T17:54:50.560293",
+          "status": "normal",
+          "location": "kitchen"
+        },
+        {
+          "sensor_id": "pressure_001",
+          "sensor_type": "pressure",
+          "value": 1014.12,
+          "unit": "hPa",
+          "timestamp": "2025-09-28T17:54:50.560293",
+          "status": "normal",
+          "location": "outdoor"
+        }
+      ],
+      "statistics": {
+        "total_sensors": 10,
+        "active_sensors": 10,
+        "total_readings": 150,
+        "total_alerts": 50,
+        "critical_alerts": 50,
+        "warning_alerts": 0,
+        "uptime": "Running"
+      }
+    },
+    {
+      "timestamp": "2025-09-28T17:55:22.521669",
+      "readings": [
+        {
+          "sensor_id": "temp_001",
+          "sensor_type": "temperature",
+          "value": 24.53,
+          "unit": "\u00b0C",
+          "timestamp": "2025-09-28T17:55:20.667652",
+          "status": "critical",
+          "location": "living_room"
+        },
+        {
+          "sensor_id": "temp_002",
+          "sensor_type": "temperature",
+          "value": 22.96,
+          "unit": "\u00b0C",
+          "timestamp": "2025-09-28T17:55:20.667652",
+          "status": "critical",
+          "location": "bedroom"
+        },
+        {
+          "sensor_id": "hum_001",
+          "sensor_type": "humidity",
+          "value": 52.26,
+          "unit": "%",
+          "timestamp": "2025-09-28T17:55:20.667652",
+          "status": "critical",
+          "location": "living_room"
+        },
+        {
+          "sensor_id": "hum_002",
+          "sensor_type": "humidity",
+          "value": 58.7,
+          "unit": "%",
+          "timestamp": "2025-09-28T17:55:20.667652",
+          "status": "critical",
+          "location": "bathroom"
+        },
+        {
+          "sensor_id": "air_001",
+          "sensor_type": "air_quality",
+          "value": 126.05,
+          "unit": "AQI",
+          "timestamp": "2025-09-28T17:55:20.667652",
+          "status": "critical",
+          "location": "living_room"
+        },
+        {
+          "sensor_id": "noise_001",
+          "sensor_type": "noise_level",
+          "value": 43.28,
+          "unit": "dB",
+          "timestamp": "2025-09-28T17:55:20.667652",
+          "status": "critical",
+          "location": "living_room"
+        },
+        {
+          "sensor_id": "light_001",
+          "sensor_type": "light_level",
+          "value": 463.07,
+          "unit": "lux",
+          "timestamp": "2025-09-28T17:55:20.667652",
+          "status": "critical",
+          "location": "living_room"
+        },
+        {
+          "sensor_id": "motion_001",
+          "sensor_type": "motion_intensity",
+          "value": 3.98,
+          "unit": "scale",
+          "timestamp": "2025-09-28T17:55:20.667652",
+          "status": "critical",
+          "location": "entrance"
+        },
+        {
+          "sensor_id": "gas_001",
+          "sensor_type": "gas_level",
+          "value": 8.88,
+          "unit": "ppm",
+          "timestamp": "2025-09-28T17:55:20.667652",
+          "status": "normal",
+          "location": "kitchen"
+        },
+        {
+          "sensor_id": "pressure_001",
+          "sensor_type": "pressure",
+          "value": 1013.56,
+          "unit": "hPa",
+          "timestamp": "2025-09-28T17:55:20.667652",
+          "status": "normal",
+          "location": "outdoor"
+        }
+      ],
+      "statistics": {
+        "total_sensors": 10,
+        "active_sensors": 10,
+        "total_readings": 300,
+        "total_alerts": 50,
+        "critical_alerts": 49,
+        "warning_alerts": 1,
+        "uptime": "Running"
+      }
+    },
+    {
+      "timestamp": "2025-09-28T17:55:52.533485",
+      "readings": [
+        {
+          "sensor_id": "temp_001",
+          "sensor_type": "temperature",
+          "value": 25.3,
+          "unit": "\u00b0C",
+          "timestamp": "2025-09-28T17:55:50.732800",
+          "status": "critical",
+          "location": "living_room"
+        },
+        {
+          "sensor_id": "temp_002",
+          "sensor_type": "temperature",
+          "value": 23.53,
+          "unit": "\u00b0C",
+          "timestamp": "2025-09-28T17:55:50.732800",
+          "status": "critical",
+          "location": "bedroom"
+        },
+        {
+          "sensor_id": "hum_001",
+          "sensor_type": "humidity",
+          "value": 56.52,
+          "unit": "%",
+          "timestamp": "2025-09-28T17:55:50.732800",
+          "status": "critical",
+          "location": "living_room"
+        },
+        {
+          "sensor_id": "hum_002",
+          "sensor_type": "humidity",
+          "value": 58.85,
+          "unit": "%",
+          "timestamp": "2025-09-28T17:55:50.732800",
+          "status": "critical",
+          "location": "bathroom"
+        },
+        {
+          "sensor_id": "air_001",
+          "sensor_type": "air_quality",
+          "value": 130.46,
+          "unit": "AQI",
+          "timestamp": "2025-09-28T17:55:50.732800",
+          "status": "critical",
+          "location": "living_room"
+        },
+        {
+          "sensor_id": "noise_001",
+          "sensor_type": "noise_level",
+          "value": 38.39,
+          "unit": "dB",
+          "timestamp": "2025-09-28T17:55:50.732800",
+          "status": "critical",
+          "location": "living_room"
+        },
+        {
+          "sensor_id": "light_001",
+          "sensor_type": "light_level",
+          "value": 500.24,
+          "unit": "lux",
+          "timestamp": "2025-09-28T17:55:50.732800",
+          "status": "critical",
+          "location": "living_room"
+        },
+        {
+          "sensor_id": "motion_001",
+          "sensor_type": "motion_intensity",
+          "value": 4.32,
+          "unit": "scale",
+          "timestamp": "2025-09-28T17:55:50.732800",
+          "status": "critical",
+          "location": "entrance"
+        },
+        {
+          "sensor_id": "gas_001",
+          "sensor_type": "gas_level",
+          "value": 8.16,
+          "unit": "ppm",
+          "timestamp": "2025-09-28T17:55:50.732800",
+          "status": "normal",
+          "location": "kitchen"
+        },
+        {
+          "sensor_id": "pressure_001",
+          "sensor_type": "pressure",
+          "value": 1012.97,
+          "unit": "hPa",
+          "timestamp": "2025-09-28T17:55:50.732800",
+          "status": "normal",
+          "location": "outdoor"
+        }
+      ],
+      "statistics": {
+        "total_sensors": 10,
+        "active_sensors": 10,
+        "total_readings": 450,
+        "total_alerts": 50,
+        "critical_alerts": 50,
+        "warning_alerts": 0,
+        "uptime": "Running"
+      }
+    }
+  ]
+}

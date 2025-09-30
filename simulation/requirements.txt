@@ -1,0 +1,22 @@
+# IoT Simulation Requirements
+# Additional dependencies for the Laura-bot IoT simulation
+
+# Simulation-specific packages
+streamlit>=1.28.0
+plotly>=5.15.0
+pandas>=2.0.0
+
+# Enhanced GUI support
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Data handling
+numpy>=1.24.0
+scipy>=1.10.0
+
+# For enhanced logging
+colorama>=0.4.6
+
+# Optional: For more advanced charts
+dash>=2.14.0
+dash-bootstrap-components>=1.4.0

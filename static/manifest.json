@@ -1,0 +1,164 @@
+{
+  "name": "Laura-bot AI Learning Assistant",
+  "short_name": "Laura-bot",
+  "description": "Advanced AI-powered learning assistant with interactive education modules, hardware integration, and personalized tutoring",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#4f46e5",
+  "background_color": "#1a1a2e",
+  "categories": ["education", "productivity", "ai"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/static/images/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/images/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/images/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/images/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/images/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/images/icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/images/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Start Learning",
+      "short_name": "Learn",
+      "description": "Begin a new learning session",
+      "url": "/learn",
+      "icons": [
+        {
+          "src": "/static/images/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Take Quiz",
+      "short_name": "Quiz",
+      "description": "Test your knowledge",
+      "url": "/quiz",
+      "icons": [
+        {
+          "src": "/static/images/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "View Progress",
+      "short_name": "Progress",
+      "description": "Check your learning progress",
+      "url": "/progress",
+      "icons": [
+        {
+          "src": "/static/images/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Hardware Control",
+      "short_name": "Hardware",
+      "description": "Control your learning robot",
+      "url": "/hardware",
+      "icons": [
+        {
+          "src": "/static/images/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/static/images/screenshot-mobile-1.png",
+      "sizes": "375x667",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mobile dashboard with learning statistics and AI assistant"
+    },
+    {
+      "src": "/static/images/screenshot-mobile-2.png",
+      "sizes": "375x667",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Interactive learning interface with voice support"
+    },
+    {
+      "src": "/static/images/screenshot-desktop-1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Desktop dashboard with comprehensive analytics"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
+  "features": [
+    "AI-powered tutoring",
+    "Interactive learning modules",
+    "Hardware robot integration",
+    "Voice interaction",
+    "Progress tracking",
+    "Real-time feedback",
+    "Offline support"
+  ],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+laurabot",
+      "url": "/?action=%s"
+    }
+  ]
+}

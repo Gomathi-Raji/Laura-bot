@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hardware Control - Laura-bot</title>
+    
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- UI Framework -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-ui.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Real-time -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.js"></script>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+</head>
+<body>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="nav-content">
+            <a href="/" class="nav-brand">
+                <div class="logo">🤖</div>
+                Laura-bot
+            </a>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/" class="nav-link">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/learn" class="nav-link">
+                        <i class="fas fa-graduation-cap"></i> Learn
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/quiz" class="nav-link">
+                        <i class="fas fa-brain"></i> Quiz
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/progress" class="nav-link">
+                        <i class="fas fa-chart-line"></i> Progress
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/hardware" class="nav-link active">
+                        <i class="fas fa-cogs"></i> Hardware
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="nav-actions">
+                <div class="connection-status" id="connection-status">
+                    <div class="status-indicator offline"></div>
+                    <span>Connecting...</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <h1 class="hero-title">Hardware Control Center</h1>
+            <p class="hero-subtitle">Monitor and control your Laura-bot's physical components in real-time</p>
+        </section>
+
+        <!-- Hardware Status Overview -->
+        <section class="status-overview">
+            <div class="status-grid">
+                <div class="status-card glass" id="arduino-status">
+                    <div class="status-icon">
+                        <i class="fas fa-microchip"></i>
+                    </div>
+                    <div class="status-content">
+                        <h3>Arduino Controller</h3>
+                        <div class="status-indicator offline"></div>
+                        <span class="status-text">Disconnected</span>
+                    </div>
+                </div>
+
+                <div class="status-card glass" id="serial-status">
+                    <div class="status-icon">
+                        <i class="fas fa-usb"></i>
+                    </div>
+                    <div class="status-content">
+                        <h3>Serial Communication</h3>
+                        <div class="status-indicator offline"></div>
+                        <span class="status-text">Disconnected</span>
+                    </div>
+                </div>
+
+                <div class="status-card glass" id="camera-status">
+                    <div class="status-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <div class="status-content">
+                        <h3>Vision System</h3>
+                        <div class="status-indicator offline"></div>
+                        <span class="status-text">Disconnected</span>
+                    </div>
+                </div>
+
+                <div class="status-card glass" id="speech-status">
+                    <div class="status-icon">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                    <div class="status-content">
+                        <h3>Speech System</h3>
+                        <div class="status-indicator offline"></div>
+                        <span class="status-text">Disconnected</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Control Panels -->
+        <section class="control-panels">
+            <div class="panels-grid">
+                <!-- Servo Control Panel -->
+                <div class="control-panel glass">
+                    <div class="panel-header">
+                        <h3>
+                            <i class="fas fa-robot"></i>
+                            Servo Control
+                        </h3>
+                        <button class="btn btn-secondary btn-sm" id="reset-servos">Reset All</button>
+                    </div>
+                    <div class="servo-controls">
+                        <div class="servo-control">
+                            <label>Head Pan</label>
+                            <div class="slider-container">
+                                <input type="range" class="servo-slider" id="head-pan" min="0" max="180" value="90" data-servo="head_pan">
+                                <span class="slider-value">90°</span>
+                            </div>
+                        </div>
+
+                        <div class="servo-control">
+                            <label>Head Tilt</label>
+                            <div class="slider-container">
+                                <input type="range" class="servo-slider" id="head-tilt" min="0" max="180" value="90" data-servo="head_tilt">
+                                <span class="slider-value">90°</span>
+                            </div>
+                        </div>
+
+                        <div class="servo-control">
+                            <label>Left Arm</label>
+                            <div class="slider-container">
+                                <input type="range" class="servo-slider" id="arm-left" min="0" max="180" value="90" data-servo="arm_left">
+                                <span class="slider-value">90°</span>
+                            </div>
+                        </div>
+
+                        <div class="servo-control">
+                            <label>Right Arm</label>
+                            <div class="slider-container">
+                                <input type="range" class="servo-slider" id="arm-right" min="0" max="180" value="90" data-servo="arm_right">
+                                <span class="slider-value">90°</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="preset-controls">
+                        <h4>Preset Positions</h4>
+                        <div class="preset-buttons">
+                            <button class="btn btn-secondary" data-preset="ready">Ready</button>
+                            <button class="btn btn-secondary" data-preset="greeting">Greeting</button>
+                            <button class="btn btn-secondary" data-preset="thinking">Thinking</button>
+                            <button class="btn btn-secondary" data-preset="celebration">Celebration</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LED Control Panel -->
+                <div class="control-panel glass">
+                    <div class="panel-header">
+                        <h3>
+                            <i class="fas fa-lightbulb"></i>
+                            LED Control
+                        </h3>
+                    </div>
+                    <div class="led-controls">
+                        <div class="led-control">
+                            <label>Status LED</label>
+                            <div class="toggle-container">
+                                <input type="checkbox" class="led-toggle" id="led-status" data-led="led_status">
+                                <label for="led-status" class="toggle-switch"></label>
+                            </div>
+                        </div>
+
+                        <div class="led-control">
+                            <label>Eye LEDs</label>
+                            <div class="toggle-container">
+                                <input type="checkbox" class="led-toggle" id="led-eyes" data-led="led_eyes">
+                                <label for="led-eyes" class="toggle-switch"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="led-patterns">
+                        <h4>LED Patterns</h4>
+                        <div class="pattern-buttons">
+                            <button class="btn btn-secondary" data-pattern="blink">Blink</button>
+                            <button class="btn btn-secondary" data-pattern="pulse">Pulse</button>
+                            <button class="btn btn-secondary" data-pattern="rainbow">Rainbow</button>
+                            <button class="btn btn-secondary" data-pattern="off">All Off</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Movement Control Panel -->
+                <div class="control-panel glass">
+                    <div class="panel-header">
+                        <h3>
+                            <i class="fas fa-arrows-alt"></i>
+                            Movement Control
+                        </h3>
+                        <div class="emergency-stop">
+                            <button class="btn btn-danger" id="emergency-stop">
+                                <i class="fas fa-stop"></i> EMERGENCY STOP
+                            </button>
+                        </div>
+                    </div>
+                    <div class="movement-controls">
+                        <div class="directional-pad">
+                            <button class="direction-btn" data-direction="forward">
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+                            <div class="middle-row">
+                                <button class="direction-btn" data-direction="left">
+                                    <i class="fas fa-arrow-left"></i>
+                                </button>
+                                <button class="direction-btn center" data-direction="stop">
+                                    <i class="fas fa-stop"></i>
+                                </button>
+                                <button class="direction-btn" data-direction="right">
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                            <button class="direction-btn" data-direction="backward">
+                                <i class="fas fa-arrow-down"></i>
+                            </button>
+                        </div>
+
+                        <div class="movement-settings">
+                            <div class="speed-control">
+                                <label>Speed</label>
+                                <input type="range" id="movement-speed" min="10" max="100" value="50">
+                                <span class="speed-value">50%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Speech Control Panel -->
+                <div class="control-panel glass">
+                    <div class="panel-header">
+                        <h3>
+                            <i class="fas fa-volume-up"></i>
+                            Speech Control
+                        </h3>
+                    </div>
+                    <div class="speech-controls">
+                        <div class="text-to-speech">
+                            <label>Text to Speech</label>
+                            <div class="speech-input-group">
+                                <textarea id="speech-text" placeholder="Enter text for Laura-bot to speak..." rows="3"></textarea>
+                                <button class="btn btn-primary" id="speak-btn">
+                                    <i class="fas fa-play"></i> Speak
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="speech-recognition">
+                            <label>Speech Recognition</label>
+                            <div class="recognition-controls">
+                                <button class="btn btn-secondary" id="listen-btn">
+                                    <i class="fas fa-microphone"></i> Listen
+                                </button>
+                                <div class="recognition-result" id="recognition-result">
+                                    <span class="result-text">Press 'Listen' to start speech recognition</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="voice-settings">
+                            <div class="setting-group">
+                                <label>Speech Rate</label>
+                                <input type="range" id="speech-rate" min="100" max="300" value="200">
+                                <span class="rate-value">200 WPM</span>
+                            </div>
+                            <div class="setting-group">
+                                <label>Volume</label>
+                                <input type="range" id="speech-volume" min="0" max="100" value="80">
+                                <span class="volume-value">80%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sensor Monitoring Panel -->
+                <div class="control-panel glass">
+                    <div class="panel-header">
+                        <h3>
+                            <i class="fas fa-chart-area"></i>
+                            Sensor Data
+                        </h3>
+                        <button class="btn btn-secondary btn-sm" id="refresh-sensors">Refresh</button>
+                    </div>
+                    <div class="sensor-data">
+                        <div class="sensor-item">
+                            <div class="sensor-icon">
+                                <i class="fas fa-ruler"></i>
+                            </div>
+                            <div class="sensor-content">
+                                <label>Distance</label>
+                                <div class="sensor-value" id="distance-value">-- cm</div>
+                                <div class="sensor-bar">
+                                    <div class="sensor-fill" id="distance-fill"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="sensor-item">
+                            <div class="sensor-icon">
+                                <i class="fas fa-sun"></i>
+                            </div>
+                            <div class="sensor-content">
+                                <label>Light Level</label>
+                                <div class="sensor-value" id="light-value">-- %</div>
+                                <div class="sensor-bar">
+                                    <div class="sensor-fill" id="light-fill"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="sensor-item">
+                            <div class="sensor-icon">
+                                <i class="fas fa-volume-up"></i>
+                            </div>
+                            <div class="sensor-content">
+                                <label>Sound Level</label>
+                                <div class="sensor-value" id="sound-value">-- dB</div>
+                                <div class="sensor-bar">
+                                    <div class="sensor-fill" id="sound-fill"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="sensor-item">
+                            <div class="sensor-icon">
+                                <i class="fas fa-hand-paper"></i>
+                            </div>
+                            <div class="sensor-content">
+                                <label>Gesture Detected</label>
+                                <div class="sensor-value" id="gesture-value">None</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Information Panel -->
+                <div class="control-panel glass">
+                    <div class="panel-header">
+                        <h3>
+                            <i class="fas fa-info-circle"></i>
+                            System Information
+                        </h3>
+                    </div>
+                    <div class="system-info">
+                        <div class="info-item">
+                            <label>Hardware Status</label>
+                            <span id="hardware-status">Initializing...</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Last Update</label>
+                            <span id="last-update">--</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Uptime</label>
+                            <span id="system-uptime">--</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Active Connections</label>
+                            <span id="active-connections">0</span>
+                        </div>
+                    </div>
+
+                    <div class="system-controls">
+                        <button class="btn btn-warning" id="restart-hardware">
+                            <i class="fas fa-redo"></i> Restart Hardware
+                        </button>
+                        <button class="btn btn-info" id="run-diagnostics">
+                            <i class="fas fa-stethoscope"></i> Run Diagnostics
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Camera Feed Section -->
+        <section class="camera-section glass">
+            <div class="section-header">
+                <h3>
+                    <i class="fas fa-eye"></i>
+                    Vision System
+                </h3>
+                <div class="camera-controls">
+                    <button class="btn btn-secondary btn-sm" id="toggle-camera">Start Camera</button>
+                    <button class="btn btn-secondary btn-sm" id="capture-image">Capture</button>
+                </div>
+            </div>
+            <div class="camera-container">
+                <div class="camera-feed" id="camera-feed">
+                    <div class="camera-placeholder">
+                        <i class="fas fa-camera"></i>
+                        <p>Camera feed will appear here</p>
+                    </div>
+                </div>
+                <div class="gesture-overlay" id="gesture-overlay">
+                    <!-- Gesture recognition overlay -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Enhanced Styles -->
+    <style>
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            font-size: 0.875rem;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            transition: var(--transition-normal);
+        }
+
+        .status-indicator.online {
+            background: #4caf50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        }
+
+        .status-indicator.offline {
+            background: #f44336;
+            box-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
+        }
+
+        .status-indicator.warning {
+            background: #ff9800;
+            box-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+        }
+
+        .status-overview {
+            margin: 2rem 0;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .status-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            transition: var(--transition-normal);
+        }
+
+        .status-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .status-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--accent-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .status-content h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .status-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .status-content .status-indicator {
+            width: 10px;
+            height: 10px;
+        }
+
+        .status-text {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+
+        .control-panels {
+            margin: 3rem 0;
+        }
+
+        .panels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+        }
+
+        .control-panel {
+            padding: 2rem;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .panel-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--font-display);
+        }
+
+        /* Servo Controls */
+        .servo-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .servo-control {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+            margin-left: 1rem;
+        }
+
+        .servo-slider {
+            flex: 1;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .servo-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--accent-gradient);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .slider-value {
+            min-width: 40px;
+            text-align: center;
+            font-weight: 600;
+            color: #4facfe;
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* LED Controls */
+        .led-controls {
+            margin-bottom: 2rem;
+        }
+
+        .led-control {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .toggle-container {
+            position: relative;
+        }
+
+        .led-toggle {
+            display: none;
+        }
+
+        .toggle-switch {
+            width: 50px;
+            height: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            position: relative;
+            cursor: pointer;
+            transition: var(--transition-normal);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 21px;
+            height: 21px;
+            background: white;
+            border-radius: 50%;
+            transition: var(--transition-normal);
+        }
+
+        .led-toggle:checked + .toggle-switch {
+            background: var(--accent-gradient);
+        }
+
+        .led-toggle:checked + .toggle-switch::after {
+            transform: translateX(25px);
+        }
+
+        .pattern-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* Movement Controls */
+        .directional-pad {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            gap: 0.5rem;
+            max-width: 200px;
+            margin: 0 auto 2rem;
+        }
+
+        .direction-btn {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .direction-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .direction-btn:active {
+            background: var(--accent-gradient);
+        }
+
+        .direction-btn:nth-child(1) { grid-column: 2; }
+        .direction-btn:nth-child(2) { grid-column: 1; grid-row: 2; }
+        .direction-btn.center { grid-column: 2; grid-row: 2; }
+        .direction-btn:nth-child(4) { grid-column: 3; grid-row: 2; }
+        .direction-btn:nth-child(5) { grid-column: 2; grid-row: 3; }
+
+        .middle-row {
+            display: contents;
+        }
+
+        .movement-settings {
+            text-align: center;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .emergency-stop .btn-danger {
+            background: linear-gradient(135deg, #ff4444, #cc0000);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 68, 68, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(255, 68, 68, 0.8); }
+        }
+
+        /* Speech Controls */
+        .speech-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .speech-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .speech-input-group textarea {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            color: white;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .recognition-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .recognition-result {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+        }
+
+        .result-text {
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        .voice-settings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .setting-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .setting-group input[type="range"] {
+            width: 100%;
+        }
+
+        /* Sensor Data */
+        .sensor-data {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .sensor-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .sensor-item .sensor-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .sensor-content {
+            flex: 1;
+        }
+
+        .sensor-content label {
+            display: block;
+            font-size: 0.875rem;
+            opacity: 0.8;
+            margin-bottom: 0.25rem;
+        }
+
+        .sensor-value {
+            font-weight: 600;
+            font-size: 1.25rem;
+            color: #4facfe;
+            margin-bottom: 0.5rem;
+        }
+
+        .sensor-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .sensor-fill {
+            height: 100%;
+            background: var(--accent-gradient);
+            width: 0%;
+            transition: width var(--transition-normal);
+        }
+
+        /* System Info */
+        .system-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-item label {
+            opacity: 0.8;
+        }
+
+        .info-item span {
+            font-weight: 600;
+            color: #4facfe;
+        }
+
+        .system-controls {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* Camera Section */
+        .camera-section {
+            margin: 3rem 0;
+            padding: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--font-display);
+        }
+
+        .camera-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .camera-container {
+            position: relative;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+        }
+
+        .camera-feed {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .camera-placeholder {
+            text-align: center;
+            opacity: 0.6;
+        }
+
+        .camera-placeholder i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .gesture-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .panels-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .status-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .directional-pad {
+                max-width: 150px;
+            }
+            
+            .direction-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 1rem;
+            }
+            
+            .voice-settings {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .camera-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+
+    <!-- Enhanced JavaScript -->
+    <script>
+        // Initialize Socket.IO
+        const socket = io();
+        
+        // Hardware state
+        let hardwareConnected = false;
+        let sensorData = {};
+        let cameraActive = false;
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeControls();
+            requestHardwareStatus();
+            setupEventListeners();
+        });
+
+        function initializeControls() {
+            // Initialize servo sliders
+            document.querySelectorAll('.servo-slider').forEach(slider => {
+                slider.addEventListener('input', function() {
+                    const value = this.value;
+                    const servo = this.dataset.servo;
+                    const valueSpan = this.nextElementSibling;
+                    
+                    valueSpan.textContent = value + '°';
+                    
+                    // Send servo command
+                    socket.emit('servo_control', {
+                        servo: servo,
+                        angle: parseInt(value)
+                    });
+                });
+            });
+
+            // Initialize LED toggles
+            document.querySelectorAll('.led-toggle').forEach(toggle => {
+                toggle.addEventListener('change', function() {
+                    const led = this.dataset.led;
+                    const state = this.checked;
+                    
+                    socket.emit('led_control', {
+                        led: led,
+                        state: state
+                    });
+                });
+            });
+
+            // Initialize movement controls
+            document.querySelectorAll('.direction-btn').forEach(btn => {
+                btn.addEventListener('mousedown', function() {
+                    const direction = this.dataset.direction;
+                    const speed = document.getElementById('movement-speed').value;
+                    
+                    socket.emit('movement_control', {
+                        direction: direction,
+                        speed: parseInt(speed)
+                    });
+                });
+                
+                btn.addEventListener('mouseup', function() {
+                    socket.emit('movement_control', {
+                        direction: 'stop',
+                        speed: 0
+                    });
+                });
+            });
+
+            // Movement speed slider
+            document.getElementById('movement-speed').addEventListener('input', function() {
+                document.querySelector('.speed-value').textContent = this.value + '%';
+            });
+
+            // Speech controls
+            document.getElementById('speak-btn').addEventListener('click', function() {
+                const text = document.getElementById('speech-text').value;
+                if (text.trim()) {
+                    socket.emit('speech_synthesis', { text: text });
+                }
+            });
+
+            document.getElementById('listen-btn').addEventListener('click', function() {
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Listening...';
+                
+                socket.emit('speech_recognition', { timeout: 5 });
+                
+                setTimeout(() => {
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-microphone"></i> Listen';
+                }, 6000);
+            });
+
+            // Speech settings
+            document.getElementById('speech-rate').addEventListener('input', function() {
+                document.querySelector('.rate-value').textContent = this.value + ' WPM';
+                socket.emit('speech_settings', {
+                    rate: parseInt(this.value),
+                    volume: document.getElementById('speech-volume').value
+                });
+            });
+
+            document.getElementById('speech-volume').addEventListener('input', function() {
+                document.querySelector('.volume-value').textContent = this.value + '%';
+                socket.emit('speech_settings', {
+                    rate: document.getElementById('speech-rate').value,
+                    volume: parseInt(this.value)
+                });
+            });
+        }
+
+        function setupEventListeners() {
+            // Preset position buttons
+            document.querySelectorAll('[data-preset]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const preset = this.dataset.preset;
+                    socket.emit('servo_preset', { preset: preset });
+                });
+            });
+
+            // LED pattern buttons
+            document.querySelectorAll('[data-pattern]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const pattern = this.dataset.pattern;
+                    socket.emit('led_pattern', { pattern: pattern });
+                });
+            });
+
+            // Emergency stop
+            document.getElementById('emergency-stop').addEventListener('click', function() {
+                socket.emit('emergency_stop');
+                showNotification('Emergency stop activated!', 'warning');
+            });
+
+            // System controls
+            document.getElementById('restart-hardware').addEventListener('click', function() {
+                if (confirm('Are you sure you want to restart the hardware?')) {
+                    socket.emit('restart_hardware');
+                    showNotification('Hardware restart initiated...', 'info');
+                }
+            });
+
+            document.getElementById('run-diagnostics').addEventListener('click', function() {
+                socket.emit('run_diagnostics');
+                showNotification('Running hardware diagnostics...', 'info');
+            });
+
+            // Camera controls
+            document.getElementById('toggle-camera').addEventListener('click', function() {
+                if (cameraActive) {
+                    socket.emit('stop_camera');
+                    this.textContent = 'Start Camera';
+                    cameraActive = false;
+                } else {
+                    socket.emit('start_camera');
+                    this.textContent = 'Stop Camera';
+                    cameraActive = true;
+                }
+            });
+
+            document.getElementById('capture-image').addEventListener('click', function() {
+                socket.emit('capture_image');
+                showNotification('Image captured!', 'success');
+            });
+
+            // Refresh sensors
+            document.getElementById('refresh-sensors').addEventListener('click', function() {
+                requestSensorData();
+            });
+
+            // Reset servos
+            document.getElementById('reset-servos').addEventListener('click', function() {
+                socket.emit('servo_preset', { preset: 'ready' });
+                
+                // Update UI sliders
+                document.querySelectorAll('.servo-slider').forEach(slider => {
+                    slider.value = 90;
+                    slider.nextElementSibling.textContent = '90°';
+                });
+            });
+        }
+
+        function requestHardwareStatus() {
+            socket.emit('request_hardware_status');
+        }
+
+        function requestSensorData() {
+            socket.emit('request_sensor_data');
+        }
+
+        function updateHardwareStatus(status) {
+            hardwareConnected = status.connected;
+            
+            // Update connection indicator
+            const connectionStatus = document.getElementById('connection-status');
+            const indicator = connectionStatus.querySelector('.status-indicator');
+            const text = connectionStatus.querySelector('span');
+            
+            if (hardwareConnected) {
+                indicator.className = 'status-indicator online';
+                text.textContent = 'Connected';
+            } else {
+                indicator.className = 'status-indicator offline';
+                text.textContent = 'Disconnected';
+            }
+            
+            // Update individual component status
+            updateComponentStatus('arduino-status', status.hardware_status.arduino);
+            updateComponentStatus('serial-status', status.hardware_status.serial);
+            updateComponentStatus('camera-status', status.hardware_status.camera);
+            updateComponentStatus('speech-status', status.hardware_status.speech);
+            
+            // Update system info
+            document.getElementById('hardware-status').textContent = 
+                hardwareConnected ? 'Online' : 'Offline';
+            document.getElementById('last-update').textContent = 
+                new Date(status.timestamp).toLocaleTimeString();
+        }
+
+        function updateComponentStatus(elementId, status) {
+            const element = document.getElementById(elementId);
+            const indicator = element.querySelector('.status-indicator');
+            const text = element.querySelector('.status-text');
+            
+            indicator.className = `status-indicator ${status}`;
+            text.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+        }
+
+        function updateSensorData(data) {
+            sensorData = data;
+            
+            // Update distance sensor
+            if (data.distance !== undefined) {
+                document.getElementById('distance-value').textContent = Math.round(data.distance) + ' cm';
+                document.getElementById('distance-fill').style.width = Math.min(data.distance, 100) + '%';
+            }
+            
+            // Update light sensor
+            if (data.light_level !== undefined) {
+                document.getElementById('light-value').textContent = Math.round(data.light_level) + ' %';
+                document.getElementById('light-fill').style.width = data.light_level + '%';
+            }
+            
+            // Update sound sensor
+            if (data.sound_level !== undefined) {
+                document.getElementById('sound-value').textContent = Math.round(data.sound_level) + ' dB';
+                document.getElementById('sound-fill').style.width = Math.min(data.sound_level, 100) + '%';
+            }
+            
+            // Update gesture recognition
+            if (data.current_gesture) {
+                document.getElementById('gesture-value').textContent = 
+                    data.current_gesture.replace('_', ' ').toUpperCase();
+            } else {
+                document.getElementById('gesture-value').textContent = 'None';
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            // Style the notification
+            Object.assign(notification.style, {
+                position: 'fixed',
+                top: '20px',
+                right: '20px',
+                padding: '1rem 1.5rem',
+                borderRadius: '8px',
+                color: 'white',
+                zIndex: '9999',
+                opacity: '0',
+                transform: 'translateX(100%)',
+                transition: 'all 0.3s ease'
+            });
+            
+            // Set background color based on type
+            const colors = {
+                success: '#4caf50',
+                warning: '#ff9800',
+                error: '#f44336',
+                info: '#2196f3'
+            };
+            notification.style.background = colors[type] || colors.info;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateX(0)';
+            }, 10);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Socket.IO event handlers
+        socket.on('hardware_status', updateHardwareStatus);
+        socket.on('sensor_data', updateSensorData);
+        
+        socket.on('speech_recognized', function(data) {
+            const resultElement = document.getElementById('recognition-result').querySelector('.result-text');
+            resultElement.textContent = data.text || 'No speech recognized';
+            resultElement.style.fontStyle = data.text ? 'normal' : 'italic';
+        });
+        
+        socket.on('hardware_response', function(data) {
+            showNotification(data.message, data.type || 'info');
+        });
+        
+        socket.on('diagnostics_complete', function(data) {
+            showNotification('Diagnostics complete: ' + data.result, 'success');
+        });
+        
+        socket.on('camera_frame', function(data) {
+            // Handle camera frame data if needed
+            const cameraFeed = document.getElementById('camera-feed');
+            // Implementation depends on how you want to display the camera feed
+        });
+
+        // Auto-refresh sensor data every 2 seconds
+        setInterval(() => {
+            if (hardwareConnected) {
+                requestSensorData();
+            }
+        }, 2000);
+
+        // Auto-refresh hardware status every 10 seconds
+        setInterval(() => {
+            requestHardwareStatus();
+        }, 10000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+# Laura-bot Hardware Integration Requirements
+# Install with: pip install -r hardware_requirements.txt
+
+# Core hardware communication
+pyserial>=3.5
+pyfirmata>=1.1.0
+
+# Computer vision and gesture recognition
+opencv-python>=4.8.0
+mediapipe>=0.10.0
+
+# Speech recognition and synthesis
+SpeechRecognition>=3.10.0
+pyttsx3>=2.90
+
+# Audio processing
+pyaudio>=0.2.11
+
+# GPIO and hardware control (for Raspberry Pi)
+RPi.GPIO>=0.7.1; sys_platform == "linux"
+gpiozero>=1.6.2; sys_platform == "linux"
+
+# Additional camera support
+pygame>=2.5.0  # For additional camera functionality
+Pillow>=10.0.0  # Image processing
+
+# Network communication
+requests>=2.31.0
+websockets>=11.0
+
+# Data processing
+numpy>=1.24.0
+pandas>=2.0.0
+
+# Real-time data handling
+threading-timer>=1.0.0
+
+# Optional: Machine learning for advanced gesture recognition
+tensorflow>=2.13.0  # Optional - remove if not needed
+scikit-learn>=1.3.0  # Optional - remove if not needed
+
+# Development and debugging
+loguru>=0.7.0  # Enhanced logging
+colorama>=0.4.6  # Colored terminal output

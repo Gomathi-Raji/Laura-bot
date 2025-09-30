@@ -1,0 +1,42 @@
+{
+  "First Quiz": {
+    "description": "Complete your first quiz",
+    "unlocked": false
+  },
+  "Perfect Score": {
+    "description": "Score 100% on a quiz",
+    "unlocked": false
+  },
+  "Study Streak": {
+    "description": "Study for 7 consecutive days",
+    "unlocked": false
+  },
+  "Math Master": {
+    "description": "Complete 10 math quizzes",
+    "unlocked": false
+  },
+  "Language Learner": {
+    "description": "Complete 10 language exercises",
+    "unlocked": false
+  },
+  "Science Explorer": {
+    "description": "Complete 10 science quizzes",
+    "unlocked": false
+  },
+  "Quick Learner": {
+    "description": "Complete a quiz in under 2 minutes",
+    "unlocked": false
+  },
+  "Persistent Student": {
+    "description": "Study for 5 hours total",
+    "unlocked": false
+  },
+  "Knowledge Seeker": {
+    "description": "Ask 100 questions",
+    "unlocked": false
+  },
+  "Improvement": {
+    "description": "Improve quiz score by 20%",
+    "unlocked": false
+  }
+}

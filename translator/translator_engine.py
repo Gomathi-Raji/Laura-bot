@@ -4,7 +4,7 @@ import google.generativeai as genai
 genai.configure(api_key="AIzaSyBif5c4kQOeJKpo-aRNQva86h1ldss_ggE")
 
 def get_model():
-    return genai.GenerativeModel("gemini-2.0-flash")
+    return genai.GenerativeModel("gemini-2.5-flash-exp")
 
 def translate_tamil_to_hindi(text):
     model = get_model()

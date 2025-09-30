@@ -1,0 +1,440 @@
+/* Laura-bot Template Fixes - Replaces all inline styles */
+
+/* Dashboard specific styles */
+.dashboard-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Quiz template fixes */
+.quiz-score-display {
+    font-size: 2em;
+}
+
+/* Learn template fixes */
+.hidden {
+    display: none;
+}
+
+.section-spacer {
+    margin-top: 2rem;
+}
+
+.chat-input-container {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.chat-input-flex {
+    flex: 1;
+}
+
+.quiz-controls {
+    margin-top: 1rem;
+}
+
+/* Hardware control fixes */
+.voice-visualizer {
+    display: none;
+}
+
+.hardware-status-box {
+    background: rgba(0,0,0,0.3);
+    padding: 15px;
+    border-radius: 10px;
+    margin: 15px 0;
+}
+
+.hardware-info-text {
+    font-size: 0.9em;
+    opacity: 0.7;
+    margin-top: 5px;
+}
+
+.clear-log-btn {
+    margin-left: auto;
+    width: auto;
+    padding: 5px 15px;
+    font-size: 12px;
+}
+
+/* Interactive learning fixes */
+.progress-fill {
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.full-width-btn {
+    width: 100%;
+}
+
+.hint-btn {
+    width: 100%;
+    margin: 10px 0;
+}
+
+.center-title {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.center-container {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.results-display {
+    display: none;
+}
+
+.results-actions {
+    margin-top: 20px;
+}
+
+/* Progress analytics fixes */
+.progress-bar-fill {
+    transition: width 0.5s ease;
+}
+
+.progress-fill-85 { width: 85%; }
+.progress-fill-78 { width: 78%; }
+.progress-fill-92 { width: 92%; }
+.progress-fill-71 { width: 71%; }
+
+.analytics-container {
+    margin-top: 15px;
+}
+
+/* Enhanced dashboard fixes */
+.action-buttons-container {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.status-info-box {
+    background: rgba(0,0,0,0.2);
+    padding: 15px;
+    border-radius: 10px;
+    margin: 10px 0;
+}
+
+/* Recent topics fixes */
+.recent-topics-container {
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.no-topics-message {
+    text-align: center;
+    opacity: 0.7;
+}
+
+.detailed-progress-btn {
+    width: 100%;
+    margin: 10px 0;
+}
+
+/* Utility classes */
+.d-none { display: none !important; }
+.d-block { display: block !important; }
+.d-inline { display: inline !important; }
+.d-inline-block { display: inline-block !important; }
+.d-flex { display: flex !important; }
+
+.flex-1 { flex: 1; }
+.gap-1 { gap: 1rem; }
+.mt-1 { margin-top: 1rem; }
+.mt-2 { margin-top: 2rem; }
+.mb-1 { margin-bottom: 1rem; }
+.mb-2 { margin-bottom: 2rem; }
+
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.w-100 { width: 100%; }
+.h-100 { height: 100%; }
+
+/* Backdrop filter fixes for Safari */
+.glassmorphism {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+/* Button state fixes */
+.btn-hidden { display: none; }
+.btn-visible { display: inline-block; }
+
+/* Form accessibility fixes */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+    .quiz-score-display {
+        font-size: 1.5em;
+    }
+    
+    .action-buttons-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .chat-input-container {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+/* Animation classes */
+.fade-in {
+    opacity: 0;
+    animation: fadeIn 0.3s ease-in-out forwards;
+}
+
+.fade-out {
+    opacity: 1;
+    animation: fadeOut 0.3s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    to { opacity: 0; }
+}
+
+.slide-up {
+    transform: translateY(20px);
+    opacity: 0;
+    animation: slideUp 0.3s ease-out forwards;
+}
+
+@keyframes slideUp {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Error state styles */
+.error-state {
+    color: #dc3545;
+    background-color: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.success-state {
+    color: #28a745;
+    background-color: rgba(40, 167, 69, 0.1);
+    border: 1px solid rgba(40, 167, 69, 0.2);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.warning-state {
+    color: #ffc107;
+    background-color: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.2);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+/* Loading states */
+.loading {
+    position: relative;
+    color: transparent;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Progress Bar Dynamic Width Classes */
+.progress-width-0 { width: 0% !important; }
+.progress-width-65 { width: 65% !important; }
+.progress-width-87 { width: 87% !important; }
+
+/* Common progress widths for dynamic updates */
+.progress-width-10 { width: 10% !important; }
+.progress-width-20 { width: 20% !important; }
+.progress-width-25 { width: 25% !important; }
+.progress-width-33 { width: 33% !important; }
+.progress-width-42 { width: 42% !important; }
+.progress-width-50 { width: 50% !important; }
+.progress-width-65 { width: 65% !important; }
+.progress-width-71 { width: 71% !important; }
+.progress-width-73 { width: 73% !important; }
+.progress-width-75 { width: 75% !important; }
+.progress-width-78 { width: 78% !important; }
+.progress-width-85 { width: 85% !important; }
+.progress-width-87 { width: 87% !important; }
+.progress-width-92 { width: 92% !important; }
+.progress-width-100 { width: 100% !important; }
+
+/* Display Utilities */
+.hidden { display: none !important; }
+.show { display: block !important; }
+.inline-show { display: inline-block !important; }
+.flex-show { display: flex !important; }
+
+/* Layout Utilities */
+.margin-top-1 { margin-top: 1rem !important; }
+.margin-top-2 { margin-top: 2rem !important; }
+.margin-top-5 { margin-top: 5px !important; }
+.margin-top-15 { margin-top: 15px !important; }
+.margin-top-30 { margin-top: 30px !important; }
+.margin-bottom-1 { margin-bottom: 1rem !important; }
+.margin-bottom-30 { margin-bottom: 30px !important; }
+.margin-10 { margin: 10px !important; }
+.margin-v-10 { margin: 10px 0 !important; }
+.margin-v-20 { margin: 20px 0 !important; }
+
+/* Text Utilities */
+.text-center { text-align: center !important; }
+.color-success { color: #4caf50 !important; }
+.color-info { color: #2196f3 !important; }
+.color-warning { color: #ff9800 !important; }
+.font-weight-600 { font-weight: 600 !important; }
+.font-size-08 { font-size: 0.8em !important; }
+.font-size-09 { font-size: 0.9em !important; }
+.opacity-07 { opacity: 0.7 !important; }
+.opacity-08 { opacity: 0.8 !important; }
+
+/* Layout Containers */
+.flex-container {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 15px !important;
+    flex-wrap: wrap !important;
+}
+
+.flex-between {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.flex-gap-1 {
+    display: flex !important;
+    gap: 1rem !important;
+    flex-wrap: wrap !important;
+}
+
+/* Background Utilities */
+.bg-dark-overlay {
+    background: rgba(0, 0, 0, 0.2) !important;
+    padding: 15px !important;
+    border-radius: 10px !important;
+    margin: 10px 0 !important;
+}
+
+.bg-dark-overlay-3 {
+    background: rgba(0, 0, 0, 0.3) !important;
+    padding: 15px !important;
+    border-radius: 10px !important;
+    margin: 15px 0 !important;
+}
+
+/* Notification and Activity Styles */
+.recent-topics-container {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border-radius: 10px !important;
+    padding: 15px !important;
+    margin: 10px 0 !important;
+    max-height: 200px !important;
+    overflow-y: auto !important;
+}
+
+/* Responsive Full Width Button */
+.full-width-responsive {
+    width: 100% !important;
+    margin: 10px 0 !important;
+}
+
+/* Mobile Card Backgrounds */
+.mobile-gradient-primary {
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.2), rgba(6, 182, 212, 0.2)) !important;
+    border: 1px solid rgba(79, 70, 229, 0.3) !important;
+}
+
+/* Icon Background Gradients */
+.icon-bg-success { background: linear-gradient(135deg, #10b981, #059669) !important; }
+.icon-bg-warning { background: linear-gradient(135deg, #f59e0b, #d97706) !important; }
+.icon-bg-primary { background: linear-gradient(135deg, #6366f1, #4f46e5) !important; }
+.icon-bg-purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important; }
+.icon-bg-danger { background: linear-gradient(135deg, #ef4444, #dc2626) !important; }
+
+/* Chat Bubble Styles */
+.chat-user-bubble {
+    background: var(--mobile-primary) !important;
+    margin-left: auto !important;
+    border-radius: 1rem 1rem 0.25rem 1rem !important;
+}
+
+/* Button Auto Size */
+.btn-auto {
+    margin-left: auto !important;
+    width: auto !important;
+    padding: 5px 15px !important;
+    font-size: 12px !important;
+}
+
+/* Section Spacing */
+.section-padding {
+    padding: 2rem !important;
+    margin-top: 2rem !important;
+    border-radius: 24px !important;
+}
+
+.section-header {
+    margin-bottom: 1.5rem !important;
+    font-family: var(--font-display) !important;
+}

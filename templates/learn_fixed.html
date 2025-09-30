@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎓 Laura-bot Learning Center</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <link href="{{ url_for('static', filename='css/template-fixes.css') }}" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            margin-bottom: 30px;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #4A5568;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            margin: 10px 0;
+        }
+
+        .status-online {
+            background: linear-gradient(135deg, #48BB78, #38A169);
+            color: white;
+        }
+
+        .status-offline {
+            background: linear-gradient(135deg, #F56565, #E53E3E);
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #4A5568;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #E2E8F0;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #48BB78, #38A169);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #F56565, #E53E3E);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .chat-area {
+            height: 300px;
+            overflow-y: auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid #E2E8F0;
+        }
+
+        .message {
+            margin: 10px 0;
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 80%;
+        }
+
+        .message.user {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .message.ai {
+            background: linear-gradient(135deg, #48BB78, #38A169);
+            color: white;
+        }
+
+        .quiz-container {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .question {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: #2D3748;
+        }
+
+        .options {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .option {
+            padding: 15px;
+            background: white;
+            border: 2px solid #E2E8F0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #F7FAFC;
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        }
+
+        .explanation-box {
+            background: linear-gradient(135deg, rgba(72, 187, 120, 0.1), rgba(56, 161, 105, 0.1));
+            border: 1px solid #48BB78;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .section-spacer {
+            margin-top: 2rem;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .chat-input-flex {
+            flex: 1;
+        }
+
+        .quiz-controls {
+            margin-top: 1rem;
+        }
+
+        .full-width-btn {
+            width: 100%;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="card">
+            <h1 class="section-title">🎓 Laura-bot Interactive Learning Center</h1>
+            <p>Welcome to your personalized AI-powered learning experience! Select a subject and difficulty to begin your educational journey.</p>
+            
+            <div class="status-indicator" id="connectionStatus">
+                <i class="fas fa-wifi"></i> Connection Status: <span id="statusText">Connecting...</span>
+            </div>
+        </div>
+
+        <!-- Learning Controls -->
+        <div class="card">
+            <div class="section-title">📚 Learning Setup</div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="subjectSelect">
+                            <i class="fas fa-book"></i> Choose Subject:
+                        </label>
+                        <select id="subjectSelect" class="form-select" title="Select a subject to study">
+                            <option value="">Select a Subject</option>
+                            <option value="mathematics">📊 Mathematics</option>
+                            <option value="science">🔬 Science</option>
+                            <option value="history">🏛️ History</option>
+                            <option value="literature">📖 Literature</option>
+                            <option value="programming">💻 Programming</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="difficultySelect">
+                            <i class="fas fa-layer-group"></i> Difficulty Level:
+                        </label>
+                        <select id="difficultySelect" class="form-select" title="Select difficulty level">
+                            <option value="beginner">🟢 Beginner</option>
+                            <option value="intermediate">🟡 Intermediate</option>
+                            <option value="advanced">🔴 Advanced</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <button id="startLearningBtn" class="btn btn-primary">
+                    <i class="fas fa-play"></i> Start Learning Session
+                </button>
+                <button id="endSessionBtn" class="btn btn-danger hidden">
+                    <i class="fas fa-stop"></i> End Session
+                </button>
+            </div>
+        </div>
+
+        <!-- Hardware Controls -->
+        <div class="card">
+            <div class="section-title section-spacer">🤖 Hardware Controls</div>
+            
+            <div class="text-center">
+                <button id="connectHardwareBtn" class="btn btn-primary">
+                    <i class="fas fa-plug"></i> Connect Hardware
+                </button>
+                <button id="startListeningBtn" class="btn btn-success">
+                    <i class="fas fa-microphone"></i> Start Voice Interaction
+                </button>
+                <button id="stopListeningBtn" class="btn btn-danger hidden">
+                    <i class="fas fa-stop"></i> Stop
+                </button>
+            </div>
+            
+            <div id="hardwareStatus" class="status-indicator status-offline">
+                <i class="fas fa-robot"></i> Hardware Status: Disconnected
+            </div>
+        </div>
+
+        <!-- AI Chat Interface -->
+        <div class="card">
+            <div class="section-title">💬 AI Learning Assistant</div>
+            
+            <div id="chatArea" class="chat-area">
+                <div class="message ai">
+                    <strong>Laura-bot:</strong> Hello! I'm your AI learning assistant. How can I help you learn today?
+                </div>
+            </div>
+            
+            <div class="chat-input-container">
+                <input type="text" id="chatInput" class="form-input chat-input-flex" 
+                       placeholder="Ask me anything or start a conversation..." 
+                       onkeypress="if(event.key==='Enter') sendMessage()">
+                <button id="sendChatBtn" class="btn btn-primary" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i> Send
+                </button>
+            </div>
+        </div>
+
+        <!-- Quiz Interface -->
+        <div id="quizScreen" class="card hidden">
+            <div class="section-title">🧠 Interactive Quiz</div>
+            
+            <div class="quiz-container">
+                <div id="quizProgress">Question 1 of 5</div>
+                <div id="quizQuestion" class="question">Loading question...</div>
+                <div id="quizOptions" class="options"></div>
+                <div id="quizExplanation" class="explanation-box hidden"></div>
+                <div class="quiz-controls">
+                    <button id="submitAnswerBtn" class="btn btn-primary" disabled>Submit Answer</button>
+                    <button id="nextQuestionBtn" class="btn btn-success hidden">Next Question</button>
+                    <button id="finishQuizBtn" class="btn btn-success hidden">Finish Quiz</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Explanation Screen -->
+        <div id="explanationScreen" class="card hidden">
+            <div class="section-title">📚 Topic Explanation</div>
+            <div id="explanationContent" class="explanation-box">
+                <p>Detailed explanation will appear here when you request help with a specific topic.</p>
+            </div>
+            <button id="backToLearningBtn" class="btn btn-primary">
+                <i class="fas fa-arrow-left"></i> Back to Learning
+            </button>
+        </div>
+
+        <!-- Learning Progress -->
+        <div class="card">
+            <div class="section-title">📈 Learning Progress</div>
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>Current Session</h5>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-width-0" id="sessionProgress"></div>
+                    </div>
+                    <small id="sessionStats">Questions answered: 0/0</small>
+                </div>
+                
+                <div class="col-md-4">
+                    <h5>Overall Progress</h5>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-width-65" id="overallProgress"></div>
+                    </div>
+                    <small>Total sessions: 12</small>
+                </div>
+                
+                <div class="col-md-4">
+                    <h5>Accuracy Rate</h5>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-width-87" id="accuracyRate"></div>
+                    </div>
+                    <small>Average accuracy: 87%</small>
+                </div>
+            </div>
+            
+            <div class="section-title section-spacer">🎯 Current Session</div>
+            <div id="currentSessionInfo">
+                <p><strong>Subject:</strong> <span id="currentSubject">None</span></p>
+                <p><strong>Difficulty:</strong> <span id="currentDifficulty">None</span></p>
+                <p><strong>Questions Completed:</strong> <span id="questionsCompleted">0</span></p>
+                <p><strong>Session Time:</strong> <span id="sessionTime">00:00</span></p>
+            </div>
+            
+            <button id="viewFullProgressBtn" class="btn btn-primary full-width-btn">
+                <i class="fas fa-chart-line"></i> View Full Progress
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        const socket = io();
+        let currentSession = null;
+        let sessionStartTime = null;
+        let currentQuizData = null;
+        let currentQuestionIndex = 0;
+        let selectedAnswer = null;
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateConnectionStatus();
+            loadUserProgress();
+            startSessionTimer();
+        });
+
+        // Socket events
+        socket.on('connect', function() {
+            updateConnectionStatus(true);
+            console.log('Connected to Laura-bot server');
+        });
+
+        socket.on('disconnect', function() {
+            updateConnectionStatus(false);
+            console.log('Disconnected from server');
+        });
+
+        socket.on('learning_response', function(data) {
+            addChatMessage('Laura-bot', data.message);
+        });
+
+        socket.on('quiz_data', function(data) {
+            currentQuizData = data;
+            showQuiz();
+        });
+
+        socket.on('hardware_status', function(data) {
+            updateHardwareStatus(data.connected);
+        });
+
+        socket.on('voice_recognized', function(data) {
+            if (data.text) {
+                addChatMessage('You (Voice)', data.text);
+                socket.emit('learning_query', {
+                    message: data.text,
+                    subject: document.getElementById('subjectSelect').value
+                });
+            }
+        });
+
+        // Learning functions
+        function startLearning() {
+            const subject = document.getElementById('subjectSelect').value;
+            const difficulty = document.getElementById('difficultySelect').value;
+            
+            if (!subject) {
+                alert('Please select a subject first!');
+                return;
+            }
+            
+            currentSession = {
+                subject: subject,
+                difficulty: difficulty,
+                startTime: new Date(),
+                questionsAnswered: 0
+            };
+            
+            sessionStartTime = new Date();
+            
+            document.getElementById('currentSubject').textContent = subject;
+            document.getElementById('currentDifficulty').textContent = difficulty;
+            document.getElementById('startLearningBtn').classList.add('hidden');
+            document.getElementById('endSessionBtn').classList.remove('hidden');
+            
+            socket.emit('start_learning_session', currentSession);
+            
+            addChatMessage('Laura-bot', `Great! Let's start learning ${subject} at ${difficulty} level. What would you like to know?`);
+        }
+
+        function endLearning() {
+            if (currentSession) {
+                socket.emit('end_learning_session', currentSession);
+                currentSession = null;
+                sessionStartTime = null;
+            }
+            
+            document.getElementById('startLearningBtn').classList.remove('hidden');
+            document.getElementById('endSessionBtn').classList.add('hidden');
+            document.getElementById('currentSubject').textContent = 'None';
+            document.getElementById('currentDifficulty').textContent = 'None';
+            document.getElementById('questionsCompleted').textContent = '0';
+            
+            addChatMessage('Laura-bot', 'Learning session ended. Great work!');
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                addChatMessage('You', message);
+                input.value = '';
+                
+                socket.emit('learning_query', {
+                    message: message,
+                    subject: document.getElementById('subjectSelect').value || 'general'
+                });
+            }
+        }
+
+        function addChatMessage(sender, message) {
+            const chatArea = document.getElementById('chatArea');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender === 'You' || sender.includes('You') ? 'user' : 'ai'}`;
+            messageDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            chatArea.appendChild(messageDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function startVoiceInteraction() {
+            const btn = document.getElementById('startListeningBtn');
+            const stopBtn = document.getElementById('stopListeningBtn');
+            
+            btn.classList.add('hidden');
+            stopBtn.classList.remove('hidden');
+            btn.classList.add('pulse');
+            
+            socket.emit('start_voice_interaction');
+            
+            addChatMessage('System', 'Voice interaction started. Please speak...');
+        }
+
+        function stopVoiceInteraction() {
+            const btn = document.getElementById('startListeningBtn');
+            const stopBtn = document.getElementById('stopListeningBtn');
+            
+            btn.classList.remove('hidden');
+            stopBtn.classList.add('hidden');
+            btn.classList.remove('pulse');
+            
+            socket.emit('stop_voice_interaction');
+            
+            addChatMessage('System', 'Voice interaction stopped.');
+        }
+
+        function connectHardware() {
+            socket.emit('connect_hardware');
+            addChatMessage('System', 'Attempting to connect to hardware...');
+        }
+
+        function updateConnectionStatus(connected = false) {
+            const statusElement = document.getElementById('connectionStatus');
+            const statusText = document.getElementById('statusText');
+            
+            if (connected) {
+                statusElement.className = 'status-indicator status-online';
+                statusText.textContent = 'Connected';
+            } else {
+                statusElement.className = 'status-indicator status-offline';
+                statusText.textContent = 'Disconnected';
+            }
+        }
+
+        function updateHardwareStatus(connected) {
+            const statusElement = document.getElementById('hardwareStatus');
+            
+            if (connected) {
+                statusElement.className = 'status-indicator status-online';
+                statusElement.innerHTML = '<i class="fas fa-robot"></i> Hardware Status: Connected';
+            } else {
+                statusElement.className = 'status-indicator status-offline';
+                statusElement.innerHTML = '<i class="fas fa-robot"></i> Hardware Status: Disconnected';
+            }
+        }
+
+        function startSessionTimer() {
+            setInterval(function() {
+                if (sessionStartTime) {
+                    const elapsed = new Date() - sessionStartTime;
+                    const minutes = Math.floor(elapsed / 60000);
+                    const seconds = Math.floor((elapsed % 60000) / 1000);
+                    document.getElementById('sessionTime').textContent = 
+                        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
+
+        function loadUserProgress() {
+            // Load user progress from server or localStorage
+            // This would typically fetch from your backend
+            console.log('Loading user progress...');
+        }
+
+        function showQuiz() {
+            document.getElementById('quizScreen').classList.remove('hidden');
+            loadQuizQuestion();
+        }
+
+        function loadQuizQuestion() {
+            if (currentQuizData && currentQuestionIndex < currentQuizData.questions.length) {
+                const question = currentQuizData.questions[currentQuestionIndex];
+                document.getElementById('quizQuestion').textContent = question.question;
+                
+                const optionsContainer = document.getElementById('quizOptions');
+                optionsContainer.innerHTML = '';
+                
+                question.options.forEach((option, index) => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'option';
+                    optionDiv.textContent = option;
+                    optionDiv.onclick = () => selectOption(index);
+                    optionsContainer.appendChild(optionDiv);
+                });
+                
+                document.getElementById('quizProgress').textContent = 
+                    `Question ${currentQuestionIndex + 1} of ${currentQuizData.questions.length}`;
+            }
+        }
+
+        function selectOption(index) {
+            selectedAnswer = index;
+            document.querySelectorAll('.option').forEach((opt, i) => {
+                opt.classList.toggle('selected', i === index);
+            });
+            document.getElementById('submitAnswerBtn').disabled = false;
+        }
+
+        function submitAnswer() {
+            if (selectedAnswer !== null) {
+                const question = currentQuizData.questions[currentQuestionIndex];
+                const isCorrect = selectedAnswer === question.correct;
+                
+                document.getElementById('quizExplanation').innerHTML = 
+                    `<strong>${isCorrect ? 'Correct!' : 'Incorrect.'}</strong> ${question.explanation}`;
+                document.getElementById('quizExplanation').classList.remove('hidden');
+                
+                document.getElementById('submitAnswerBtn').classList.add('hidden');
+                
+                if (currentQuestionIndex < currentQuizData.questions.length - 1) {
+                    document.getElementById('nextQuestionBtn').classList.remove('hidden');
+                } else {
+                    document.getElementById('finishQuizBtn').classList.remove('hidden');
+                }
+                
+                if (currentSession) {
+                    currentSession.questionsAnswered++;
+                    document.getElementById('questionsCompleted').textContent = currentSession.questionsAnswered;
+                }
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            selectedAnswer = null;
+            document.getElementById('quizExplanation').classList.add('hidden');
+            document.getElementById('submitAnswerBtn').classList.remove('hidden');
+            document.getElementById('nextQuestionBtn').classList.add('hidden');
+            document.getElementById('submitAnswerBtn').disabled = true;
+            loadQuizQuestion();
+        }
+
+        function finishQuiz() {
+            document.getElementById('quizScreen').classList.add('hidden');
+            addChatMessage('Laura-bot', 'Quiz completed! Great job on finishing the questions.');
+            currentQuizData = null;
+            currentQuestionIndex = 0;
+        }
+
+        function viewFullProgress() {
+            window.location.href = '/progress';
+        }
+
+        function showExplanation(topic) {
+            document.getElementById('explanationScreen').classList.remove('hidden');
+            socket.emit('request_explanation', { topic: topic });
+        }
+
+        function backToLearning() {
+            document.getElementById('explanationScreen').classList.add('hidden');
+        }
+
+        // Event listeners
+        document.getElementById('startLearningBtn').addEventListener('click', startLearning);
+        document.getElementById('endSessionBtn').addEventListener('click', endLearning);
+        document.getElementById('connectHardwareBtn').addEventListener('click', connectHardware);
+        document.getElementById('startListeningBtn').addEventListener('click', startVoiceInteraction);
+        document.getElementById('stopListeningBtn').addEventListener('click', stopVoiceInteraction);
+        document.getElementById('submitAnswerBtn').addEventListener('click', submitAnswer);
+        document.getElementById('nextQuestionBtn').addEventListener('click', nextQuestion);
+        document.getElementById('finishQuizBtn').addEventListener('click', finishQuiz);
+        document.getElementById('backToLearningBtn').addEventListener('click', backToLearning);
+        document.getElementById('viewFullProgressBtn').addEventListener('click', viewFullProgress);
+    </script>
+</body>
+</html>
