@@ -1,5 +1,17 @@
-/* Laura-bot Mobile-First Responsive Design */
-/* Enhanced mobile optimization for all templates */
+/* Laura-bot Mobile-First Dark Gradient Theme */
+/* Enhanced mobile optimization with modern dark gradients */
+
+/* Dark Theme Variables for Mobile */
+:root {
+    --mobile-bg-primary: linear-gradient(135deg, #0c0c1d 0%, #111132 50%, #1a1a2e 100%);
+    --mobile-bg-secondary: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+    --mobile-surface: rgba(255, 255, 255, 0.05);
+    --mobile-surface-hover: rgba(255, 255, 255, 0.1);
+    --mobile-accent: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --mobile-text: #ffffff;
+    --mobile-text-secondary: rgba(255, 255, 255, 0.8);
+    --mobile-border: rgba(255, 255, 255, 0.1);
+}
 
 /* Base Mobile-First Styles */
 @media screen and (max-width: 768px) {
@@ -23,14 +35,19 @@
         overflow-x: hidden;
         padding: 0;
         margin: 0;
+        background: linear-gradient(135deg, #0c0c1d 0%, #111132 50%, #1a1a2e 100%);
+        color: #ffffff;
     }
     
-    /* Enhanced Touch Targets */
+    /* Enhanced Touch Targets - Dark Theme */
     .btn, button, .card, .subject-card, .answer-option {
         min-height: 44px; /* Apple's recommended minimum touch target */
         min-width: 44px;
         touch-action: manipulation;
-        -webkit-tap-highlight-color: rgba(76, 175, 80, 0.3);
+        -webkit-tap-highlight-color: rgba(102, 126, 234, 0.3);
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #ffffff;
     }
     
     /* Navbar Mobile Optimization */

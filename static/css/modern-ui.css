@@ -4,14 +4,25 @@
  */
 
 :root {
-  /* Modern Color Palette */
-  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  --dark-gradient: linear-gradient(135deg, #232526 0%, #414345 100%);
-  --glass-bg: rgba(255, 255, 255, 0.1);
-  --glass-border: rgba(255, 255, 255, 0.2);
-  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  /* Dark Modern Gradient Color Palette */
+  --primary-gradient: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+  --secondary-gradient: linear-gradient(135deg, #232526 0%, #414345 100%);
+  --accent-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --highlight-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  --success-gradient: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+  --warning-gradient: linear-gradient(135deg, #ffa726 0%, #fb8c00 100%);
+  --danger-gradient: linear-gradient(135deg, #ff5252 0%, #f44336 100%);
+  
+  /* Glass Morphism - Dark Theme */
+  --glass-bg: rgba(0, 0, 0, 0.25);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  
+  /* Card and Surface Colors */
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-hover-bg: rgba(255, 255, 255, 0.1);
+  --surface-dark: rgba(0, 0, 0, 0.3);
+  --surface-light: rgba(255, 255, 255, 0.05);
   
   /* Typography */
   --font-primary: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -59,7 +70,7 @@ html {
 body {
   font-family: var(--font-primary);
   line-height: 1.6;
-  color: white;
+  color: #ffffff;
   background: var(--primary-gradient);
   background-attachment: fixed;
   min-height: 100vh;
@@ -67,7 +78,7 @@ body {
   position: relative;
 }
 
-/* Animated Background */
+/* Dark Animated Background with Gradient Orbs */
 body::before {
   content: '';
   position: fixed;
@@ -76,16 +87,43 @@ body::before {
   width: 100%;
   height: 100%;
   background: 
-    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+    radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(0, 210, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 60% 70%, rgba(255, 107, 107, 0.1) 0%, transparent 50%);
   z-index: -1;
-  animation: backgroundFloat 20s ease-in-out infinite;
+  animation: backgroundFloat 25s ease-in-out infinite;
+}
+
+/* Additional floating particles */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, rgba(255, 255, 255, 0.15), transparent),
+    radial-gradient(2px 2px at 40px 70px, rgba(102, 126, 234, 0.2), transparent),
+    radial-gradient(1px 1px at 90px 40px, rgba(118, 75, 162, 0.15), transparent),
+    radial-gradient(1px 1px at 130px 80px, rgba(0, 210, 255, 0.1), transparent);
+  background-repeat: repeat;
+  background-size: 150px 100px;
+  z-index: -1;
+  animation: particleFloat 30s linear infinite;
 }
 
 @keyframes backgroundFloat {
   0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
-  50% { opacity: 0.8; transform: scale(1.1) rotate(5deg); }
+  33% { opacity: 0.8; transform: scale(1.05) rotate(2deg); }
+  66% { opacity: 0.9; transform: scale(1.1) rotate(-2deg); }
+}
+
+@keyframes particleFloat {
+  0% { transform: translateY(0) translateX(0); }
+  50% { transform: translateY(-10px) translateX(5px); }
+  100% { transform: translateY(0) translateX(0); }
 }
 
 /* Glass Morphism Components */

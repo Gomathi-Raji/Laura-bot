@@ -3,26 +3,26 @@ Mobile App-Like UI Framework for Laura-bot
 Optimized for touch devices with native app feel
 */
 
-/* ===== MOBILE-FIRST VARIABLES ===== */
+/* ===== MOBILE DARK GRADIENT VARIABLES ===== */
 :root {
-  /* Mobile-optimized colors */
-  --mobile-primary: #4f46e5;
-  --mobile-primary-dark: #3730a3;
-  --mobile-secondary: #06b6d4;
-  --mobile-accent: #f59e0b;
-  --mobile-success: #10b981;
-  --mobile-warning: #f59e0b;
-  --mobile-error: #ef4444;
+  /* Mobile Dark Gradient Colors */
+  --mobile-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --mobile-primary-dark: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+  --mobile-secondary: linear-gradient(135deg, #00d4aa 0%, #00b894 100%);
+  --mobile-accent: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  --mobile-success: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+  --mobile-warning: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
+  --mobile-error: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
   
-  /* Mobile backgrounds */
-  --mobile-bg-primary: #0f172a;
-  --mobile-bg-secondary: #1e293b;
-  --mobile-bg-card: rgba(30, 41, 59, 0.95);
-  --mobile-bg-overlay: rgba(15, 23, 42, 0.98);
+  /* Mobile Dark Gradient Backgrounds */
+  --mobile-bg-primary: linear-gradient(135deg, #0c0c1d 0%, #111132 50%, #1a1a2e 100%);
+  --mobile-bg-secondary: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+  --mobile-bg-card: rgba(255, 255, 255, 0.05);
+  --mobile-bg-overlay: rgba(0, 0, 0, 0.85);
   
-  /* Mobile glass effects */
-  --mobile-glass: rgba(255, 255, 255, 0.08);
-  --mobile-glass-border: rgba(255, 255, 255, 0.12);
+  /* Mobile Glass Effects - Dark Theme */
+  --mobile-glass: rgba(255, 255, 255, 0.05);
+  --mobile-glass-border: rgba(255, 255, 255, 0.1);
   --mobile-glass-hover: rgba(255, 255, 255, 0.15);
   
   /* Mobile typography */
