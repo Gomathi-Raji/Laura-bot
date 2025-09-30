@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "session_id": "Alice_Math_20250930_174738",
+    "user_name": "Alice",
+    "subject": "Math",
+    "topic": "Algebra",
+    "start_time": "2025-09-30T17:47:38.209725",
+    "end_time": "2025-09-30T17:47:38.214726",
+    "duration_minutes": 8.335e-05,
+    "interactions": 5,
+    "quiz_score": 80.0,
+    "completed": true,
+    "difficulty_level": 2
+  }
+]

@@ -1,1 +1,17 @@
-{}
+{
+  "Alice": {
+    "user_name": "Alice",
+    "total_sessions": 1,
+    "total_time_minutes": 8.335e-05,
+    "subjects_studied": [
+      "Math"
+    ],
+    "average_quiz_score": 80.0,
+    "current_streak": 1,
+    "best_streak": 1,
+    "last_activity": "2025-09-30T17:47:38.214726",
+    "achievements": [],
+    "weak_topics": [],
+    "strong_topics": []
+  }
+}

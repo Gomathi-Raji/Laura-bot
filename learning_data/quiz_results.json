@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "quiz_id": "quiz_20250930_174738",
+    "session_id": "Alice_Math_20250930_174738",
+    "subject": "Math",
+    "topic": "Algebra",
+    "total_questions": 10,
+    "correct_answers": 8,
+    "score_percentage": 80.0,
+    "time_taken_seconds": 180,
+    "difficulty_level": 2,
+    "timestamp": "2025-09-30T17:47:38.209725"
+  }
+]
