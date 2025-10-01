@@ -61,6 +61,16 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="/language-learning" class="nav-link">
+                        <i class="fas fa-globe"></i> Language Learning
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/debate-mode" class="nav-link">
+                        <i class="fas fa-comments"></i> Debate Mode
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="/hardware" class="nav-link">
                         <i class="fas fa-microchip"></i> Hardware
                     </a>
@@ -158,6 +168,58 @@
                     <canvas id="progressChart" width="280" height="120"></canvas>
                 </div>
                 <a href="/progress" class="card-link">View Analytics</a>
+            </div>
+
+            <!-- Language Learning Card -->
+            <div class="modern-card" onclick="navigateTo('/language-learning')">
+                <div class="card-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <h3 class="card-title">Language Learning Mode</h3>
+                <p class="card-description">
+                    Interactive Tamil, English & Hindi learning with AI-powered translations, pronunciation guides, and personalized practice.
+                </p>
+                <div class="language-stats">
+                    <div class="flex-between" style="margin: 8px 0;">
+                        <span>தமிழ் ↔ English:</span>
+                        <span style="color: #4caf50;">Available</span>
+                    </div>
+                    <div class="flex-between" style="margin: 8px 0;">
+                        <span>தமிழ் ↔ हिंदी:</span>
+                        <span style="color: #4caf50;">Available</span>
+                    </div>
+                    <div class="flex-between">
+                        <span>Practice Mode:</span>
+                        <span style="color: #ff9800;">Ready</span>
+                    </div>
+                </div>
+                <a href="/language-learning" class="card-link">Start Learning</a>
+            </div>
+
+            <!-- Debate Mode Card -->
+            <div class="modern-card" onclick="navigateTo('/debate-mode')">
+                <div class="card-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h3 class="card-title">Debate Mode</h3>
+                <p class="card-description">
+                    Engage in intelligent debates with AI on various topics. Sharpen your argumentation skills and explore different perspectives.
+                </p>
+                <div class="debate-stats">
+                    <div class="flex-between" style="margin: 8px 0;">
+                        <span><i class="fas fa-brain"></i> AI Opponent:</span>
+                        <span style="color: #4caf50;">Ready</span>
+                    </div>
+                    <div class="flex-between" style="margin: 8px 0;">
+                        <span><i class="fas fa-trophy"></i> Topics Available:</span>
+                        <span style="color: #2196f3;">25+</span>
+                    </div>
+                    <div class="flex-between">
+                        <span><i class="fas fa-chart-line"></i> Progress Tracking:</span>
+                        <span style="color: #ff9800;">Active</span>
+                    </div>
+                </div>
+                <a href="/debate-mode" class="card-link">Start Debating</a>
             </div>
 
             <!-- Hardware Control Card -->

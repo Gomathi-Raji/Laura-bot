@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debate Mode - Laura Bot</title>
+    
+    <!-- CSS Files with Dark Gradient Theme -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-ui.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-responsive.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-app.css') }}">
+    
+    <style>
+        .debate-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .debate-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .debate-header h1 {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+        }
+        
+        .debate-setup {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .topic-selection {
+            background: rgba(255, 255, 255, 0.1);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .position-selection {
+            background: rgba(255, 255, 255, 0.1);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .topic-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .category-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 1rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .category-btn:hover, .category-btn.active {
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.3) 0%, rgba(245, 87, 108, 0.3) 100%);
+            border-color: #f093fb;
+            transform: translateY(-2px);
+        }
+        
+        .topic-suggestions {
+            margin-top: 1rem;
+        }
+        
+        .topic-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 0.5rem 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .topic-item:hover, .topic-item.selected {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: #f093fb;
+            transform: translateX(5px);
+        }
+        
+        .position-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .position-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .position-card:hover, .position-card.selected {
+            border-color: #f093fb;
+            background: rgba(240, 147, 251, 0.1);
+            transform: scale(1.02);
+        }
+        
+        .position-label {
+            font-weight: bold;
+            color: #f093fb;
+            margin-bottom: 0.5rem;
+        }
+        
+        .debate-arena {
+            background: rgba(255, 255, 255, 0.1);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: none;
+        }
+        
+        .debate-arena.active {
+            display: block;
+        }
+        
+        .debate-topic-display {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #f093fb;
+        }
+        
+        .positions-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .user-position, .ai-position {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 15px;
+        }
+        
+        .user-position {
+            border-left: 4px solid #4caf50;
+        }
+        
+        .ai-position {
+            border-left: 4px solid #ff9800;
+        }
+        
+        .debate-flow {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+        }
+        
+        .argument-item {
+            margin: 1rem 0;
+            padding: 1.5rem;
+            border-radius: 15px;
+            position: relative;
+        }
+        
+        .user-argument {
+            background: rgba(76, 175, 80, 0.2);
+            border-left: 4px solid #4caf50;
+            margin-left: 2rem;
+        }
+        
+        .ai-argument {
+            background: rgba(255, 152, 0, 0.2);
+            border-left: 4px solid #ff9800;
+            margin-right: 2rem;
+        }
+        
+        .argument-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .speaker-name {
+            font-weight: bold;
+            color: white;
+        }
+        
+        .round-number {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+        
+        .argument-text {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        
+        .argument-reasoning {
+            color: rgba(255, 255, 255, 0.7);
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+        
+        .input-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+        
+        .argument-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 1rem;
+            color: white;
+            font-size: 1.1rem;
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .argument-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .debate-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .debate-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            border-radius: 50px;
+            padding: 1rem 2rem;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .debate-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(240, 147, 251, 0.4);
+        }
+        
+        .debate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .debate-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #f093fb;
+        }
+        
+        .stat-label {
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 0.5rem;
+        }
+        
+        .round-evaluation {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 1rem 0;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .evaluation-scores {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.5rem 0;
+        }
+        
+        .final-evaluation {
+            background: rgba(255, 255, 255, 0.15);
+            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(15px);
+            padding: 2rem;
+            border-radius: 20px;
+            margin: 2rem 0;
+            border: 2px solid rgba(240, 147, 251, 0.3);
+            display: none;
+        }
+        
+        .final-evaluation.active {
+            display: block;
+        }
+        
+        .winner-announcement {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .winner-text {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .evaluation-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        
+        .evaluation-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 15px;
+        }
+        
+        .section-title {
+            color: #f093fb;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        
+        .voice-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .voice-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50px;
+            padding: 1rem 2rem;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .voice-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .voice-btn.listening {
+            animation: pulse 2s infinite;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @media (max-width: 768px) {
+            .debate-setup {
+                grid-template-columns: 1fr;
+            }
+            
+            .positions-display {
+                grid-template-columns: 1fr;
+            }
+            
+            .position-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .topic-categories {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="debate-container">
+        <div class="debate-header">
+            <h1>🎯 Debate Mode</h1>
+            <p class="subtitle">Engage in intelligent discussions and sharpen your argumentation skills</p>
+        </div>
+        
+        <!-- Debate Setup Section -->
+        <div class="debate-setup" id="debateSetup">
+            <!-- Topic Selection -->
+            <div class="topic-selection">
+                <h3>📝 Choose Your Topic</h3>
+                
+                <div class="topic-categories">
+                    <div class="category-btn" data-category="technology">💻 Technology</div>
+                    <div class="category-btn" data-category="education">📚 Education</div>
+                    <div class="category-btn" data-category="environment">🌍 Environment</div>
+                    <div class="category-btn" data-category="society">🏛️ Society</div>
+                    <div class="category-btn" data-category="ethics">⚖️ Ethics</div>
+                </div>
+                
+                <div class="topic-suggestions" id="topicSuggestions">
+                    <p>Select a category to see topic suggestions</p>
+                </div>
+                
+                <div style="margin-top: 1rem;">
+                    <input type="text" id="customTopic" placeholder="Or enter your own debate topic..." 
+                           style="width: 100%; padding: 0.8rem; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white;">
+                </div>
+            </div>
+            
+            <!-- Position Selection -->
+            <div class="position-selection">
+                <h3>🎭 Choose Your Position</h3>
+                <p>Select a topic first to see position options</p>
+                
+                <div class="position-options" id="positionOptions">
+                    <!-- Position cards will be populated by JavaScript -->
+                </div>
+                
+                <div class="voice-controls">
+                    <button class="voice-btn" id="listenTopicBtn">🎤 Voice Topic</button>
+                    <button class="debate-btn" id="startDebateBtn" disabled>Start Debate</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Debate Arena -->
+        <div class="debate-arena" id="debateArena">
+            <div class="debate-topic-display" id="topicDisplay">
+                <!-- Current topic will be displayed here -->
+            </div>
+            
+            <div class="positions-display">
+                <div class="user-position">
+                    <h4>👤 Your Position</h4>
+                    <p id="userPositionText">Your position will appear here</p>
+                </div>
+                <div class="ai-position">
+                    <h4>🤖 AI Position</h4>
+                    <p id="aiPositionText">AI position will appear here</p>
+                </div>
+            </div>
+            
+            <div class="debate-flow" id="debateFlow">
+                <p style="text-align: center; color: rgba(255,255,255,0.7);">Debate arguments will appear here as the discussion progresses...</p>
+            </div>
+            
+            <div class="input-section">
+                <textarea id="argumentInput" class="argument-input" placeholder="Present your argument here..."></textarea>
+                <div class="voice-controls">
+                    <button class="voice-btn" id="listenArgumentBtn">🎤 Voice Input</button>
+                    <button class="debate-btn" id="submitArgumentBtn">Submit Argument</button>
+                    <button class="debate-btn" id="endDebateBtn">End Debate</button>
+                </div>
+            </div>
+            
+            <div id="currentEvaluation" class="round-evaluation" style="display: none;">
+                <!-- Round evaluation will appear here -->
+            </div>
+        </div>
+        
+        <!-- Final Evaluation -->
+        <div class="final-evaluation" id="finalEvaluation">
+            <div class="winner-announcement">
+                <div class="winner-text" id="winnerText">Debate Complete!</div>
+                <p id="winnerSubtext">Final evaluation loading...</p>
+            </div>
+            
+            <div class="evaluation-details">
+                <div class="evaluation-section">
+                    <div class="section-title">🏆 Final Scores</div>
+                    <div id="finalScores">Loading scores...</div>
+                </div>
+                
+                <div class="evaluation-section">
+                    <div class="section-title">💪 Your Strengths</div>
+                    <div id="userStrengths">Loading strengths...</div>
+                </div>
+                
+                <div class="evaluation-section">
+                    <div class="section-title">📈 Areas for Improvement</div>
+                    <div id="userImprovements">Loading improvements...</div>
+                </div>
+                
+                <div class="evaluation-section">
+                    <div class="section-title">🎯 Key Insights</div>
+                    <div id="keyInsights">Loading insights...</div>
+                </div>
+            </div>
+            
+            <div class="debate-controls">
+                <button class="debate-btn" id="newDebateBtn">Start New Debate</button>
+                <button class="debate-btn" id="viewStatsBtn">View Statistics</button>
+            </div>
+        </div>
+        
+        <!-- Debate Statistics -->
+        <div class="debate-stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalDebates">0</div>
+                <div class="stat-label">Total Debates</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="userWins">0</div>
+                <div class="stat-label">Your Wins</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="aiWins">0</div>
+                <div class="stat-label">AI Wins</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="winRate">0%</div>
+                <div class="stat-label">Win Rate</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentTopic = '';
+        let selectedPosition = '';
+        let debateInProgress = false;
+        let currentRound = 0;
+        let isListening = false;
+        
+        // Topic categories and suggestions
+        const topicCategories = {
+            technology: [
+                'Is artificial intelligence more beneficial or harmful to society?',
+                'Should social media platforms be held responsible for user content?',
+                'Is remote work better than office work?',
+                'Should robots replace human workers in dangerous jobs?',
+                'Is cryptocurrency the future of money?'
+            ],
+            education: [
+                'Should traditional education be replaced by online learning?',
+                'Is homework necessary for student success?',
+                'Should students be allowed to use AI tools for assignments?',
+                'Is competitive grading beneficial or harmful?',
+                'Should financial literacy be mandatory in schools?'
+            ],
+            environment: [
+                'Is nuclear energy necessary for fighting climate change?',
+                'Should plastic bags be completely banned?',
+                'Is individual action or government policy more important for environmental protection?',
+                'Should we prioritize economic growth or environmental protection?',
+                'Is space exploration worth the environmental cost?'
+            ],
+            society: [
+                'Should universal basic income be implemented?',
+                'Is censorship ever justified in democratic societies?',
+                'Should voting be mandatory for all citizens?',
+                'Is fast food advertising harmful to public health?',
+                'Should public transportation be free for everyone?'
+            ],
+            ethics: [
+                'Is it ethical to use animals for scientific research?',
+                'Should genetic engineering of humans be allowed?',
+                'Is it right to prioritize saving human lives over animal lives?',
+                'Should wealthy countries be required to accept more refugees?',
+                'Is capital punishment ever justified?'
+            ]
+        };
+        
+        // Category selection
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all buttons
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                // Show topic suggestions
+                const category = this.dataset.category;
+                showTopicSuggestions(category);
+            });
+        });
+        
+        function showTopicSuggestions(category) {
+            const suggestionsDiv = document.getElementById('topicSuggestions');
+            const topics = topicCategories[category];
+            
+            suggestionsDiv.innerHTML = '<h4>💡 Suggested Topics:</h4>';
+            
+            topics.forEach((topic, index) => {
+                const topicDiv = document.createElement('div');
+                topicDiv.className = 'topic-item';
+                topicDiv.textContent = topic;
+                topicDiv.addEventListener('click', function() {
+                    selectTopic(topic);
+                });
+                suggestionsDiv.appendChild(topicDiv);
+            });
+        }
+        
+        function selectTopic(topic) {
+            currentTopic = topic;
+            
+            // Highlight selected topic
+            document.querySelectorAll('.topic-item').forEach(item => item.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            // Generate position options
+            generatePositionOptions(topic);
+            
+            // Update topic display
+            document.getElementById('topicDisplay').innerHTML = `<h3>🎯 Topic: ${topic}</h3>`;
+        }
+        
+        function generatePositionOptions(topic) {
+            // This would typically call the backend API
+            // For now, we'll create generic pro/con positions
+            
+            const positionsDiv = document.getElementById('positionOptions');
+            positionsDiv.innerHTML = `
+                <div class="position-card" data-position="pro">
+                    <div class="position-label">PRO</div>
+                    <p>I support this position</p>
+                </div>
+                <div class="position-card" data-position="con">
+                    <div class="position-label">CON</div>
+                    <p>I oppose this position</p>
+                </div>
+            `;
+            
+            // Add click listeners to position cards
+            document.querySelectorAll('.position-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    // Remove selected class from all cards
+                    document.querySelectorAll('.position-card').forEach(c => c.classList.remove('selected'));
+                    
+                    // Add selected class to clicked card
+                    this.classList.add('selected');
+                    
+                    selectedPosition = this.dataset.position;
+                    
+                    // Enable start debate button
+                    document.getElementById('startDebateBtn').disabled = false;
+                });
+            });
+        }
+        
+        // Start debate
+        document.getElementById('startDebateBtn').addEventListener('click', function() {
+            if (currentTopic && selectedPosition) {
+                startDebate();
+            }
+        });
+        
+        function startDebate() {
+            // Hide setup, show arena
+            document.getElementById('debateSetup').style.display = 'none';
+            document.getElementById('debateArena').classList.add('active');
+            
+            debateInProgress = true;
+            
+            // Update position displays
+            document.getElementById('userPositionText').textContent = `${selectedPosition.toUpperCase()}: I ${selectedPosition === 'pro' ? 'support' : 'oppose'} the topic`;
+            document.getElementById('aiPositionText').textContent = `I will argue the ${selectedPosition === 'pro' ? 'CON' : 'PRO'} position`;
+            
+            // Clear debate flow
+            document.getElementById('debateFlow').innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.7);">Present your opening argument to begin the debate...</p>';
+            
+            loadDebateStats();
+        }
+        
+        // Submit argument
+        document.getElementById('submitArgumentBtn').addEventListener('click', function() {
+            const argumentText = document.getElementById('argumentInput').value.trim();
+            if (argumentText && debateInProgress) {
+                submitArgument(argumentText);
+            }
+        });
+        
+        function submitArgument(argument) {
+            currentRound++;
+            
+            // Add user argument to debate flow
+            addArgumentToFlow('user', argument, currentRound);
+            
+            // Clear input
+            document.getElementById('argumentInput').value = '';
+            
+            // Simulate AI response (in real implementation, call backend API)
+            setTimeout(() => {
+                const aiArgument = generateAIResponse(argument);
+                addArgumentToFlow('ai', aiArgument, currentRound);
+                
+                // Show round evaluation
+                showRoundEvaluation(currentRound);
+            }, 2000);
+        }
+        
+        function addArgumentToFlow(speaker, argument, round) {
+            const debateFlow = document.getElementById('debateFlow');
+            
+            const argumentDiv = document.createElement('div');
+            argumentDiv.className = `argument-item ${speaker}-argument`;
+            
+            argumentDiv.innerHTML = `
+                <div class="argument-header">
+                    <span class="speaker-name">${speaker === 'user' ? '👤 You' : '🤖 AI'}</span>
+                    <span class="round-number">Round ${round}</span>
+                </div>
+                <div class="argument-text">${argument}</div>
+            `;
+            
+            debateFlow.appendChild(argumentDiv);
+            debateFlow.scrollTop = debateFlow.scrollHeight;
+        }
+        
+        function generateAIResponse(userArgument) {
+            // This would call the backend API in real implementation
+            const responses = [
+                "I appreciate your perspective, but I must respectfully disagree. Let me present an alternative viewpoint...",
+                "While your argument has merit, there are several counterpoints to consider...",
+                "That's an interesting point, however, the evidence suggests otherwise...",
+                "I understand your position, but I believe there's a stronger case for the opposite view..."
+            ];
+            
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+        
+        function showRoundEvaluation(round) {
+            const evaluationDiv = document.getElementById('currentEvaluation');
+            
+            // Simulate evaluation (in real implementation, get from backend)
+            const evaluation = {
+                round_winner: Math.random() > 0.5 ? 'user' : 'ai',
+                feedback: 'Both arguments presented valid points with good reasoning.',
+                strongest_point: 'The evidence-based approach was particularly effective.'
+            };
+            
+            evaluationDiv.innerHTML = `
+                <h4>📊 Round ${round} Evaluation</h4>
+                <p><strong>Round Winner:</strong> ${evaluation.round_winner === 'user' ? '👤 You' : '🤖 AI'}</p>
+                <p><strong>Feedback:</strong> ${evaluation.feedback}</p>
+                <p><strong>Strongest Point:</strong> ${evaluation.strongest_point}</p>
+            `;
+            
+            evaluationDiv.style.display = 'block';
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                evaluationDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        // End debate
+        document.getElementById('endDebateBtn').addEventListener('click', function() {
+            if (debateInProgress) {
+                endDebate();
+            }
+        });
+        
+        function endDebate() {
+            debateInProgress = false;
+            
+            // Hide arena, show final evaluation
+            document.getElementById('debateArena').classList.remove('active');
+            document.getElementById('finalEvaluation').classList.add('active');
+            
+            // Generate final evaluation
+            showFinalEvaluation();
+        }
+        
+        function showFinalEvaluation() {
+            // Simulate final evaluation (in real implementation, get from backend)
+            const finalResult = {
+                overall_winner: Math.random() > 0.5 ? 'user' : 'ai',
+                final_score: { user: Math.floor(Math.random() * 5), ai: Math.floor(Math.random() * 5) },
+                user_strengths: ['Strong logical reasoning', 'Good use of examples'],
+                user_improvements: ['Consider counterarguments', 'Provide more evidence'],
+                key_insights: ['Different perspectives explored', 'Complex topic with valid points on both sides']
+            };
+            
+            document.getElementById('winnerText').textContent = 
+                finalResult.overall_winner === 'user' ? '🏆 You Won!' : '🤖 AI Won!';
+            document.getElementById('winnerSubtext').textContent = 
+                'Great debate! Here\'s your performance analysis:';
+            
+            document.getElementById('finalScores').innerHTML = 
+                `You: ${finalResult.final_score.user} | AI: ${finalResult.final_score.ai}`;
+            
+            document.getElementById('userStrengths').innerHTML = 
+                finalResult.user_strengths.map(s => `• ${s}`).join('<br>');
+            
+            document.getElementById('userImprovements').innerHTML = 
+                finalResult.user_improvements.map(i => `• ${i}`).join('<br>');
+            
+            document.getElementById('keyInsights').innerHTML = 
+                finalResult.key_insights.map(insight => `• ${insight}`).join('<br>');
+        }
+        
+        // New debate
+        document.getElementById('newDebateBtn').addEventListener('click', function() {
+            resetDebate();
+        });
+        
+        function resetDebate() {
+            // Reset variables
+            currentTopic = '';
+            selectedPosition = '';
+            debateInProgress = false;
+            currentRound = 0;
+            
+            // Hide final evaluation, show setup
+            document.getElementById('finalEvaluation').classList.remove('active');
+            document.getElementById('debateSetup').style.display = 'grid';
+            
+            // Reset UI elements
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.topic-item').forEach(item => item.classList.remove('selected'));
+            document.querySelectorAll('.position-card').forEach(card => card.classList.remove('selected'));
+            document.getElementById('startDebateBtn').disabled = true;
+            document.getElementById('topicSuggestions').innerHTML = '<p>Select a category to see topic suggestions</p>';
+            document.getElementById('positionOptions').innerHTML = '';
+            document.getElementById('customTopic').value = '';
+        }
+        
+        // Voice input functionality
+        document.getElementById('listenTopicBtn').addEventListener('click', function() {
+            if (!isListening) {
+                startListening('topic');
+            }
+        });
+        
+        document.getElementById('listenArgumentBtn').addEventListener('click', function() {
+            if (!isListening) {
+                startListening('argument');
+            }
+        });
+        
+        function startListening(type) {
+            if ('webkitSpeechRecognition' in window) {
+                isListening = true;
+                const recognition = new webkitSpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+                
+                const btn = type === 'topic' ? document.getElementById('listenTopicBtn') : document.getElementById('listenArgumentBtn');
+                btn.classList.add('listening');
+                btn.textContent = '🛑 Stop';
+                
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    
+                    if (type === 'topic') {
+                        document.getElementById('customTopic').value = transcript;
+                        selectTopic(transcript);
+                    } else {
+                        document.getElementById('argumentInput').value = transcript;
+                    }
+                    
+                    stopListening(btn, type);
+                };
+                
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error:', event.error);
+                    stopListening(btn, type);
+                };
+                
+                recognition.onend = function() {
+                    stopListening(btn, type);
+                };
+                
+                recognition.start();
+            } else {
+                alert('Speech recognition not supported in this browser');
+            }
+        }
+        
+        function stopListening(btn, type) {
+            isListening = false;
+            btn.classList.remove('listening');
+            btn.textContent = type === 'topic' ? '🎤 Voice Topic' : '🎤 Voice Input';
+        }
+        
+        function loadDebateStats() {
+            // Simulate loading stats (in real implementation, get from backend)
+            const stats = {
+                total_debates: Math.floor(Math.random() * 50) + 1,
+                user_wins: Math.floor(Math.random() * 25),
+                ai_wins: Math.floor(Math.random() * 25),
+                user_win_rate: Math.floor(Math.random() * 100)
+            };
+            
+            document.getElementById('totalDebates').textContent = stats.total_debates;
+            document.getElementById('userWins').textContent = stats.user_wins;
+            document.getElementById('aiWins').textContent = stats.ai_wins;
+            document.getElementById('winRate').textContent = stats.user_win_rate + '%';
+        }
+        
+        // Custom topic input
+        document.getElementById('customTopic').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const customTopic = this.value.trim();
+                if (customTopic) {
+                    selectTopic(customTopic);
+                }
+            }
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDebateStats();
+        });
+    </script>
+</body>
+</html>

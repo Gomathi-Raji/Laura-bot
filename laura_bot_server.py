@@ -291,6 +291,26 @@ try:
                     pass
         return '<h1>⚙️ Hardware Control</h1><p>Arduino and IoT integration coming soon!</p><a href="/">← Back to Dashboard</a>'
     
+    @app.route('/language-learning')
+    def language_learning():
+        """Language Learning Mode Route"""
+        if has_templates:
+            try:
+                return render_template('language_learning.html')
+            except Exception as e:
+                print(f"Error loading language learning template: {e}")
+        return '<h1>🎓 Language Learning Mode</h1><p>Interactive Tamil, English & Hindi learning coming soon!</p><a href="/">← Back to Dashboard</a>'
+    
+    @app.route('/debate-mode')
+    def debate_mode_route():
+        """Debate Mode Route"""
+        if has_templates:
+            try:
+                return render_template('debate_mode.html')
+            except Exception as e:
+                print(f"Error loading debate mode template: {e}")
+        return '<h1>🎯 Debate Mode</h1><p>Interactive AI-powered debates and discussions coming soon!</p><a href="/">← Back to Dashboard</a>'
+    
     @app.route('/api/test')
     def api_test():
         return jsonify({{
@@ -333,6 +353,267 @@ try:
                 {{'subject': 'History', 'score': 93, 'date': '2024-01-13'}}
             ]
         }})
+    
+    @app.route('/api/translate', methods=['POST'])
+    def translate_api():
+        """Language Learning Translation API"""
+        try:
+            # Import language learning mode
+            from translator.language_learning_mode import language_learner
+            
+            data = request.get_json()
+            text = data.get('text', '').strip()
+            source_lang = data.get('source_lang', '').lower()
+            target_lang = data.get('target_lang', '').lower()
+            
+            if not text or not source_lang or not target_lang:
+                return jsonify({
+                    'error': 'Missing required fields: text, source_lang, target_lang'
+                }), 400
+            
+            # Perform enhanced translation with learning features
+            result = language_learner.translate_with_learning(text, source_lang, target_lang)
+            
+            return jsonify({
+                'success': True,
+                'translation': result.get('translation', ''),
+                'pronunciation': result.get('pronunciation', ''),
+                'grammar_note': result.get('grammar_note', ''),
+                'cultural_context': result.get('cultural_context', ''),
+                'difficulty_level': result.get('difficulty_level', 'beginner'),
+                'source_text': text,
+                'source_language': source_lang,
+                'target_language': target_lang,
+                'timestamp': datetime.now().isoformat()
+            })
+            
+        except Exception as e:
+            print(f"Translation API error: {e}")
+            return jsonify({
+                'error': f'Translation failed: {str(e)}',
+                'success': False
+            }), 500
+    
+    @app.route('/api/debate/start', methods=['POST'])
+    def start_debate_api():
+        """Start a new debate session"""
+        try:
+            # Import debate mode
+            from ai.debate_mode import debate_mode
+            
+            data = request.get_json()
+            topic = data.get('topic', '').strip()
+            user_position = data.get('user_position', '').strip()
+            ai_persona = data.get('ai_persona', 'balanced')
+            
+            result = debate_mode.start_debate(topic, user_position, ai_persona)
+            
+            return jsonify({
+                'success': True,
+                'debate_setup': result,
+                'timestamp': datetime.now().isoformat()
+            })
+            
+        except Exception as e:
+            print(f"Start debate API error: {e}")
+            return jsonify({
+                'error': f'Failed to start debate: {str(e)}',
+                'success': False
+            }), 500
+    
+    @app.route('/api/debate/position', methods=['POST'])
+    def set_debate_position_api():
+        """Set user's debate position"""
+        try:
+            from ai.debate_mode import debate_mode
+            
+            data = request.get_json()
+            position = data.get('position', '').strip()
+            
+            if not position:
+                return jsonify({
+                    'error': 'Missing required field: position'
+                }), 400
+            
+            result = debate_mode.set_user_position(position)
+            
+            return jsonify({
+                'success': True,
+                'position_setup': result,
+                'timestamp': datetime.now().isoformat()
+            })
+            
+        except Exception as e:
+            print(f"Set position API error: {e}")
+            return jsonify({
+                'error': f'Failed to set position: {str(e)}',
+                'success': False
+            }), 500
+    
+    @app.route('/api/debate/argument', methods=['POST'])
+    def submit_argument_api():
+        """Submit user argument and get AI counter-argument"""
+        try:
+            from ai.debate_mode import debate_mode
+            
+            data = request.get_json()
+            argument = data.get('argument', '').strip()
+            
+            if not argument:
+                return jsonify({
+                    'error': 'Missing required field: argument'
+                }), 400
+            
+            result = debate_mode.process_user_argument(argument)
+            
+            return jsonify({
+                'success': True,
+                'debate_response': result,
+                'timestamp': datetime.now().isoformat()
+            })
+            
+        except Exception as e:
+            print(f"Submit argument API error: {e}")
+            return jsonify({
+                'error': f'Failed to process argument: {str(e)}',
+                'success': False
+            }), 500
+    
+    @app.route('/api/debate/end', methods=['POST'])
+    def end_debate_api():
+        """End current debate and get final evaluation"""
+        try:
+            from ai.debate_mode import debate_mode
+            
+            result = debate_mode.end_debate()
+            
+            return jsonify({
+                'success': True,
+                'final_evaluation': result,
+                'timestamp': datetime.now().isoformat()
+            })
+            
+        except Exception as e:
+            print(f"End debate API error: {e}")
+            return jsonify({
+                'error': f'Failed to end debate: {str(e)}',
+                'success': False
+            }), 500
+    
+    @app.route('/api/debate/suggestions')
+    def debate_suggestions_api():
+        """Get debate topic suggestions"""
+        try:
+            from ai.debate_mode import debate_mode
+            
+            category = request.args.get('category', '')
+            result = debate_mode.get_debate_suggestions(category if category else None)
+            
+            return jsonify({
+                'success': True,
+                'suggestions': result,
+                'timestamp': datetime.now().isoformat()
+            })
+            
+        except Exception as e:
+            print(f"Debate suggestions API error: {e}")
+            return jsonify({
+                'error': f'Failed to get suggestions: {str(e)}',
+                'success': False
+            }), 500
+    
+    @app.route('/api/debate/stats')
+    def debate_stats_api():
+        """Get debate statistics"""
+        try:
+            from ai.debate_mode import debate_mode
+            
+            stats = debate_mode.get_debate_stats()
+            
+            return jsonify({
+                'success': True,
+                'stats': stats,
+                'timestamp': datetime.now().isoformat()
+            })
+            
+        except Exception as e:
+            print(f"Debate stats API error: {e}")
+            return jsonify({
+                'error': f'Failed to get stats: {str(e)}',
+                'success': False
+            }), 500
+    
+    @app.route('/api/debate/status')
+    def debate_status_api():
+        """Get current debate status"""
+        try:
+            from ai.debate_mode import debate_mode
+            
+            status = debate_mode.get_current_status()
+            
+            return jsonify({
+                'success': True,
+                'status': status,
+                'timestamp': datetime.now().isoformat()
+            })
+            
+        except Exception as e:
+            print(f"Debate status API error: {e}")
+            return jsonify({
+                'error': f'Failed to get status: {str(e)}',
+                'success': False
+            }), 500
+
+    @app.route('/api/language-stats')
+    def language_stats_api():
+        """Get language learning statistics"""
+        try:
+            from translator.language_learning_mode import language_learner
+            
+            stats = language_learner.get_learning_stats()
+            return jsonify({
+                'success': True,
+                'stats': stats,
+                'timestamp': datetime.now().isoformat()
+            })
+            
+        except Exception as e:
+            print(f"Language stats API error: {e}")
+            return jsonify({
+                'error': f'Failed to get stats: {str(e)}',
+                'success': False
+            }), 500
+    
+    @app.route('/api/practice-suggestions')
+    def practice_suggestions_api():
+        """Get practice suggestions for language pair"""
+        try:
+            from translator.language_learning_mode import language_learner
+            
+            source_lang = request.args.get('source', '').lower()
+            target_lang = request.args.get('target', '').lower()
+            
+            if not source_lang or not target_lang:
+                return jsonify({
+                    'error': 'Missing required parameters: source, target'
+                }), 400
+            
+            language_pair = f"{source_lang}_{target_lang}"
+            suggestions = language_learner.get_practice_suggestion(language_pair)
+            
+            return jsonify({
+                'success': True,
+                'suggestions': suggestions,
+                'language_pair': language_pair,
+                'timestamp': datetime.now().isoformat()
+            })
+            
+        except Exception as e:
+            print(f"Practice suggestions API error: {e}")
+            return jsonify({
+                'error': f'Failed to get suggestions: {str(e)}',
+                'success': False
+            }), 500
     
     # Hardware Socket.IO events
     @socketio.on('request_hardware_status')

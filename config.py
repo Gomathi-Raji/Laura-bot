@@ -7,7 +7,7 @@ try:
     
     def get_model():
         try:
-            return genai.GenerativeModel("gemini-2.5-flash")
+            return genai.GenerativeModel("gemini-2.5-flash-lite")
         except Exception as e:
             print(f"⚠️ Gemini model error: {e}")
             return None

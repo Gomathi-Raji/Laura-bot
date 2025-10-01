@@ -6,10 +6,26 @@ from voice.listener import listen
 from ai.gemini_ai import get_response
 from tasks.general_tasks import execute_command
 
+# --- Smart Hardware Manager ---
+from smart_hardware_manager import (
+    get_hardware_manager, 
+    smart_listen, 
+    smart_speak, 
+    smart_visual_feedback,
+    smart_gesture_recognition,
+    initialize_smart_hardware
+)
+
 # --- Tamil to Hindi Translator Imports ---
 from translator.speech_input import recognize_speech
 from translator.translator_engine import translate_tamil_to_hindi
 from translator.speech_output import speak_text
+
+# --- Language Learning Mode Imports ---
+from translator.language_learning_mode import language_learner
+
+# --- Debate Mode Imports ---
+from ai.debate_mode import debate_mode
 
 # --- GIF Display Imports ---
 import speech_recognition as sr
@@ -451,6 +467,516 @@ def translate_text(text, source_lang, target_lang):
             return f"Translation error for {source_lang} to {target_lang}: {text}"
 
 
+def language_learning_mode():
+    """Interactive Language Learning Mode with Tamil, English, and Hindi"""
+    print("\n🎓 === LANGUAGE LEARNING MODE ACTIVATED ===")
+    speak("லாங்குவேஜ் லேர்னிங் மோட் ஆக்டிவேட் ஆயிருச்சு!")
+    
+    # Show available language combinations
+    speak("மூன்று மொழிகள்: தமிழ், இங்கிலீஷ், ஹிந்தி. எந்த மொழியிலிருந்து எந்த மொழிக்கு கற்க வேண்டும்?")
+    print("🌍 Available Language Learning Combinations:")
+    print("1️⃣ Tamil ➡️ English (தமிழ் ➡️ இங்கிலீஷ்)")
+    print("2️⃣ Tamil ➡️ Hindi (தமிழ் ➡️ ஹிந்தி)")
+    print("3️⃣ English ➡️ Tamil (English ➡️ தமிழ்)")
+    print("4️⃣ English ➡️ Hindi (English ➡️ हिंदी)")
+    print("5️⃣ Hindi ➡️ Tamil (हिंदी ➡️ தமிழ்)")
+    print("6️⃣ Hindi ➡️ English (हिंदी ➡️ English)")
+    print("7️⃣ Practice Mode (பயிற்சி மோட்)")
+    print("8️⃣ Quiz Mode (வினாடி வினா)")
+    print("9️⃣ Learning Stats (கற்றல் புள்ளிவிவரம்)")
+    
+    # Get user selection
+    source_lang = ""
+    target_lang = ""
+    mode_type = "translation"
+    
+    while True:
+        try:
+            speak("உங்கள் தேர்வை சொல்லுங்கள்.")
+            selection = recognize_speech().lower()
+            log_conversation("User", selection)
+            
+            if any(word in selection for word in ["tamil english", "tamil to english", "one", "1", "தமிழ் இங்கிலீஷ்"]):
+                source_lang, target_lang = "tamil", "english"
+                break
+            elif any(word in selection for word in ["tamil hindi", "tamil to hindi", "two", "2", "தமிழ் ஹிந்தி"]):
+                source_lang, target_lang = "tamil", "hindi"
+                break
+            elif any(word in selection for word in ["english tamil", "english to tamil", "three", "3", "இங்கிலீஷ் தமிழ்"]):
+                source_lang, target_lang = "english", "tamil"
+                break
+            elif any(word in selection for word in ["english hindi", "english to hindi", "four", "4", "இங்கிலீஷ் ஹிந்தி"]):
+                source_lang, target_lang = "english", "hindi"
+                break
+            elif any(word in selection for word in ["hindi tamil", "hindi to tamil", "five", "5", "ஹிந்தி தமிழ்"]):
+                source_lang, target_lang = "hindi", "tamil"
+                break
+            elif any(word in selection for word in ["hindi english", "hindi to english", "six", "6", "ஹiந்தி இங்கிलீஷ்"]):
+                source_lang, target_lang = "hindi", "english"
+                break
+            elif any(word in selection for word in ["practice", "seven", "7", "பயிற்சி", "practice mode"]):
+                mode_type = "practice"
+                break
+            elif any(word in selection for word in ["quiz", "eight", "8", "வினாடி வினா", "quiz mode"]):
+                mode_type = "quiz"
+                break
+            elif any(word in selection for word in ["stats", "nine", "9", "புள்ளிவிவரம்", "statistics"]):
+                show_learning_stats()
+                continue
+            else:
+                speak("தெளிவான தேர்வு சொல்லுங்கள். ஒன்று முதல் ஒன்பது வரை.")
+                print("❌ Please choose 1-9 or say the option clearly.")
+                continue
+                
+        except Exception as e:
+            speak("தேர்வு புரிந்துகொள்ள முடியவில்லை. மீண்டும் சொல்லுங்கள்.")
+            print(f"❌ Could not understand selection: {e}")
+            continue
+    
+    # Execute selected mode
+    if mode_type == "practice":
+        start_practice_mode()
+    elif mode_type == "quiz":
+        start_quiz_mode()
+    else:
+        start_learning_translation(source_lang, target_lang)
+
+
+def start_learning_translation(source_lang, target_lang):
+    """Start interactive learning translation"""
+    selection_msg = f"{source_lang.title()} ➡️ {target_lang.title()} கற்றல் முறை தேர்ந்தெடுக்கப்பட்டது."
+    speak(selection_msg)
+    log_conversation("Assistant", selection_msg)
+    print(f"✅ Learning Mode: {source_lang.title()} ➡️ {target_lang.title()}")
+    
+    # Get practice suggestions
+    language_pair = f"{source_lang}_{target_lang}"
+    suggestions = language_learner.get_practice_suggestion(language_pair)
+    
+    if suggestions:
+        speak("பயிற்சிக்கான சில பரிந்துரைகள்:")
+        print("💡 Practice Suggestions:")
+        for i, suggestion in enumerate(suggestions, 1):
+            print(f"   {i}. {suggestion}")
+    
+    speak(f"{source_lang.title()} மொழியில் பேசுங்கள். விரிவான கற்றல் தகவல்களுடன் {target_lang.title()} மொழியில் மொழிபெயர்க்கப்படும்.")
+    print(f"🎓 Learning Translation Mode Active. Say something in {source_lang.title()}.")
+    
+    while True:
+        input_text = recognize_speech()
+        log_conversation("User", input_text)
+        
+        if input_text.lower() in ["stop", "exit", "niruthu", "நிறுத்து", "quit", "learning complete"]:
+            speak("கற்றல் முறை நிறுத்தப்பட்டது. நன்றி!")
+            log_conversation("Assistant", "Language learning mode stopped.")
+            print("🛑 Exiting language learning mode.")
+            show_session_summary()
+            break
+            
+        if input_text.strip() == "":
+            continue
+            
+        print(f"🗣️ {source_lang.title()}: {input_text}")
+        
+        # Get enhanced translation with learning features
+        result = language_learner.translate_with_learning(input_text, source_lang, target_lang)
+        
+        translation = result.get('translation', 'Translation error')
+        pronunciation = result.get('pronunciation', '')
+        grammar_note = result.get('grammar_note', '')
+        cultural_context = result.get('cultural_context', '')
+        
+        print(f"📝 {target_lang.title()}: {translation}")
+        speak_text(translation)
+        
+        # Provide additional learning information
+        if pronunciation:
+            print(f"🔊 Pronunciation: {pronunciation}")
+            
+        if grammar_note:
+            print(f"📚 Grammar: {grammar_note}")
+            speak(f"கிராமர் குறிப்பு: {grammar_note}")
+            
+        if cultural_context:
+            print(f"🌍 Cultural Context: {cultural_context}")
+            
+        log_conversation("Assistant", f"Translation: {translation}")
+
+
+def start_practice_mode():
+    """Start practice mode with random phrases"""
+    speak("பயிற்சி முறை தொடங்குகிறது!")
+    print("🏋️ === PRACTICE MODE ===")
+    
+    # Choose a random language combination
+    import random
+    combinations = [
+        ('tamil', 'english'), ('tamil', 'hindi'), ('english', 'tamil'),
+        ('english', 'hindi'), ('hindi', 'tamil'), ('hindi', 'english')
+    ]
+    
+    source_lang, target_lang = random.choice(combinations)
+    speak(f"{source_lang.title()} இலிருந்து {target_lang.title()} பயிற்சி.")
+    
+    # Get practice phrases
+    language_pair = f"{source_lang}_{target_lang}"
+    suggestions = language_learner.get_practice_suggestion(language_pair)
+    
+    if not suggestions:
+        speak("பயிற்சிக்கான சொற்கள் கிடைக்கவில்லை. முதலில் சில வார்த்தைகளை கற்றுக்கொள்ளுங்கள்.")
+        return
+    
+    for phrase in suggestions:
+        speak(f"இதை மொழிபெயர்க்கவும்: {phrase}")
+        print(f"🔄 Translate: {phrase}")
+        
+        user_translation = recognize_speech()
+        if user_translation.lower() in ["stop", "exit", "skip"]:
+            break
+            
+        correct_answer = language_learner.simple_translate(phrase, source_lang, target_lang)
+        print(f"✅ Correct Answer: {correct_answer}")
+        speak(f"சரியான பதில்: {correct_answer}")
+        
+        log_conversation("Practice", f"Q: {phrase} | User: {user_translation} | Correct: {correct_answer}")
+
+
+def start_quiz_mode():
+    """Start quiz mode"""
+    speak("வினாடி வினா முறை!")
+    print("🧠 === QUIZ MODE ===")
+    
+    # Ask for language combination
+    speak("எந்த மொழி கலவைக்கு வினாடி வினா வேண்டும்?")
+    
+    # For now, use a default combination
+    source_lang, target_lang = "tamil", "english"
+    
+    quiz = language_learner.generate_quiz(source_lang, target_lang)
+    
+    if not quiz:
+        speak("வினாடி வினாவுக்கு போதுமான தகவல் இல்லை. முதலில் கொஞ்சம் கற்றுக்கொள்ளுங்கள்.")
+        print("❌ Not enough learned words for quiz. Learn some words first.")
+        return
+    
+    score = 0
+    total_questions = len(quiz['questions'])
+    
+    speak(f"{total_questions} கேள்விகள் உள்ளன.")
+    
+    for i, question in enumerate(quiz['questions'], 1):
+        print(f"\n❓ Question {i}/{total_questions}: {question['question']}")
+        speak(f"கேள்வி {i}: {question['source_text']} இதை மொழிபெயர்க்கவும்.")
+        
+        user_answer = recognize_speech()
+        correct_answer = question['correct_answer']
+        
+        if user_answer.lower().strip() == correct_answer.lower().strip():
+            score += 1
+            print("✅ Correct!")
+            speak("சரி!")
+        else:
+            print(f"❌ Wrong. Correct answer: {correct_answer}")
+            speak(f"தவறு. சரியான பதில்: {correct_answer}")
+    
+    # Show final score
+    percentage = (score / total_questions) * 100
+    print(f"\n🏆 Quiz Complete! Score: {score}/{total_questions} ({percentage:.1f}%)")
+    speak(f"வினாடி வினா முடிந்தது! மதிப்பெண்: {score} out of {total_questions}")
+    
+    log_conversation("Quiz", f"Score: {score}/{total_questions}")
+
+
+def show_learning_stats():
+    """Show learning statistics"""
+    stats = language_learner.get_learning_stats()
+    
+    print("\n📊 === LEARNING STATISTICS ===")
+    print(f"📝 Total Translations: {stats['total_translations']}")
+    print(f"🌍 Languages Practiced: {len(stats['languages_practiced'])}")
+    print(f"🎯 This Session: {stats['session_count']} translations")
+    
+    mastery = stats['mastery_breakdown']
+    print(f"📈 Mastery Levels:")
+    print(f"   🟢 Beginner: {mastery['beginner']}")
+    print(f"   🟡 Intermediate: {mastery['intermediate']}")
+    print(f"   🔴 Advanced: {mastery['advanced']}")
+    
+    # Speak key statistics
+    speak(f"மொத்தம் {stats['total_translations']} மொழிபெயர்ப்புகள் செய்யப்பட்டுள்ளன.")
+    
+    log_conversation("Stats", f"Total: {stats['total_translations']}, Session: {stats['session_count']}")
+
+
+def show_session_summary():
+    """Show summary of current learning session"""
+    session = language_learner.current_session
+    
+    if session['translations']:
+        print(f"\n📋 Session Summary: {len(session['translations'])} new translations learned")
+        speak(f"இந்த அமர்வில் {len(session['translations'])} புதிய மொழிபெயர்ப்புகள் கற்றுக்கொண்டீர்கள்.")
+    else:
+        speak("இந்த அமர்வில் புதிய மொழிபெயர்ப்புகள் இல்லை.")
+
+
+def debate_mode_session():
+    """Interactive Debate Mode with AI"""
+    print("\n🎯 === DEBATE MODE ACTIVATED ===")
+    speak("டிபேட் மோட் ஆக்டிவேட் ஆயிருச்சு! Let's have an engaging discussion!")
+    
+    # Show debate options
+    speak("நீங்கள் என்ன விஷயத்தை பற்றி விவாதிக்க விரும்புகிறீர்கள்?")
+    print("🗣️ Debate Mode Options:")
+    print("1️⃣ Choose a topic from suggestions")
+    print("2️⃣ Suggest your own topic")
+    print("3️⃣ Random topic surprise")
+    print("4️⃣ View debate statistics")
+    print("5️⃣ Exit debate mode")
+    
+    while True:
+        try:
+            speak("உங்கள் தேர்வை சொல்லுங்கள்.")
+            selection = recognize_speech().lower()
+            log_conversation("User", selection)
+            
+            if any(word in selection for word in ["suggestions", "choose topic", "one", "1", "பரிந்துரைகள்"]):
+                start_topic_selection()
+                break
+            elif any(word in selection for word in ["own topic", "suggest", "two", "2", "என் விஷயம்"]):
+                start_custom_topic()
+                break
+            elif any(word in selection for word in ["random", "surprise", "three", "3", "சீரற்ற"]):
+                start_random_debate()
+                break
+            elif any(word in selection for word in ["statistics", "stats", "four", "4", "புள்ளிவிவரம்"]):
+                show_debate_statistics()
+                continue
+            elif any(word in selection for word in ["exit", "quit", "five", "5", "வெளியேறு"]):
+                speak("டிபேட் மோட் நிறுத்தப்பட்டது. நன்றி!")
+                break
+            else:
+                speak("தெளிவான தேர்வு சொல்லுங்கள். ஒன்று முதல் ஐந்து வரை.")
+                print("❌ Please choose 1-5 or say the option clearly.")
+                continue
+                
+        except Exception as e:
+            speak("தேர்வு புரிந்துகொள்ள முடியவில்லை. மீண்டும் சொல்லுங்கள்.")
+            print(f"❌ Could not understand selection: {e}")
+            continue
+
+
+def start_topic_selection():
+    """Start debate with topic suggestions"""
+    suggestions = debate_mode.get_debate_suggestions()
+    
+    print("\n📝 Suggested Debate Topics:")
+    speak("இங்கே சில விவாத தலைப்புகள்:")
+    
+    for i, topic in enumerate(suggestions['suggested_topics'], 1):
+        print(f"   {i}. {topic}")
+    
+    speak("எந்த தலைப்பை தேர்ந்தெடுக்க விரும்புகிறீர்கள்?")
+    print("🎯 Say the number (1-5) or describe the topic you want to debate.")
+    
+    while True:
+        try:
+            choice = recognize_speech().lower()
+            log_conversation("User", choice)
+            
+            # Check for numbers
+            topic_selected = None
+            for i, topic in enumerate(suggestions['suggested_topics'], 1):
+                if str(i) in choice or f"number {i}" in choice:
+                    topic_selected = topic
+                    break
+            
+            if topic_selected:
+                result = debate_mode.start_debate(topic_selected)
+                start_debate_session(result)
+                break
+            else:
+                speak("தெளிவான எண் சொல்லுங்கள் அல்லது தலைப்பை விவரிக்கவும்.")
+                continue
+                
+        except Exception as e:
+            speak("புரிந்துகொள்ள முடியவில்லை. மீண்டும் சொல்லுங்கள்.")
+            continue
+
+
+def start_custom_topic():
+    """Start debate with user's custom topic"""
+    speak("உங்கள் விவாத தலைப்பை சொல்லுங்கள்.")
+    print("🎤 What would you like to debate about? State your topic:")
+    
+    try:
+        custom_topic = recognize_speech()
+        log_conversation("User", f"Custom topic: {custom_topic}")
+        
+        if custom_topic.strip():
+            result = debate_mode.start_debate(custom_topic)
+            speak(f"சிறந்த தலைப்பு! {custom_topic} பற்றி விவாதிக்கலாம்.")
+            start_debate_session(result)
+        else:
+            speak("தலைப்பு கேட்கவில்லை. மீண்டும் முயற்சிக்கவும்.")
+            
+    except Exception as e:
+        speak("தலைப்பு புரிந்துகொள்ள முடியவில்லை.")
+        print(f"❌ Could not understand topic: {e}")
+
+
+def start_random_debate():
+    """Start debate with random topic"""
+    suggestions = debate_mode.get_debate_suggestions()
+    random_topic = suggestions['random_topic']
+    
+    speak(f"சீரற்ற தலைப்பு: {random_topic}")
+    print(f"🎲 Random Topic: {random_topic}")
+    
+    result = debate_mode.start_debate(random_topic)
+    start_debate_session(result)
+
+
+def start_debate_session(debate_setup):
+    """Main debate session loop"""
+    print(f"\n🎯 Debate Topic: {debate_setup['topic']}")
+    print("📋 Choose your position:")
+    
+    positions = debate_setup['suggested_positions']
+    print(f"1️⃣ PRO: {positions['pro']}")
+    print(f"2️⃣ CON: {positions['con']}")
+    
+    speak("நீங்கள் எந்த நிலைப்பாட்டை எடுக்க விரும்புகிறீர்கள்? வேண்டும் அல்லது வேண்டாம்?")
+    
+    # Get user position
+    while True:
+        try:
+            position_choice = recognize_speech().lower()
+            log_conversation("User", position_choice)
+            
+            user_position = ""
+            if any(word in position_choice for word in ["pro", "support", "agree", "yes", "one", "1", "வேண்டும்"]):
+                user_position = positions['pro']
+            elif any(word in position_choice for word in ["con", "against", "disagree", "no", "two", "2", "வேண்டாம்"]):
+                user_position = positions['con']
+            else:
+                speak("PRO அல்லது CON தேர்ந்தெடுக்கவும். ஒன்று அல்லது இரண்டு சொல்லுங்கள்.")
+                continue
+            
+            # Set positions and start debate
+            setup_result = debate_mode.set_user_position(user_position)
+            
+            print(f"✅ Your Position: {setup_result['user_position']}")
+            print(f"🤖 AI Position: {setup_result['ai_position']}")
+            speak("நல்லது! நான் எதிர் நிலைப்பாட்டை எடுப்பேன். உங்கள் முதல் வாதத்தை முன்வையுங்கள்.")
+            
+            # Start argument exchange
+            conduct_debate_rounds()
+            break
+            
+        except Exception as e:
+            speak("நிலைப்பாட்டை புரிந்துகொள்ள முடியவில்லை. மீண்டும் சொல்லுங்கள்.")
+            continue
+
+
+def conduct_debate_rounds():
+    """Conduct the main debate argument exchange"""
+    round_count = 0
+    max_rounds = 5
+    
+    speak(f"விவாதம் தொடங்குகிறது! மொத்தம் {max_rounds} சுற்றுகள். உங்கள் வாதத்தை ஆரம்பிக்கவும்.")
+    
+    while round_count < max_rounds:
+        print(f"\n🔄 Round {round_count + 1} of {max_rounds}")
+        print("🎤 Present your argument:")
+        speak("உங்கள் வாதத்தை முன்வையுங்கள்.")
+        
+        try:
+            user_argument = recognize_speech()
+            if not user_argument.strip():
+                speak("வாதம் கேட்கவில்லை. மீண்டும் முயற்சிக்கவும்.")
+                continue
+            
+            log_conversation("User Argument", user_argument)
+            print(f"👤 Your Argument: {user_argument}")
+            
+            # Get AI response
+            result = debate_mode.process_user_argument(user_argument)
+            
+            print(f"\n🤖 AI Counter-Argument: {result['ai_argument']}")
+            if result.get('ai_reasoning'):
+                print(f"📊 AI Reasoning: {result['ai_reasoning']}")
+            
+            speak(f"என் மறுப்பு: {result['ai_argument']}")
+            log_conversation("AI Counter-Argument", result['ai_argument'])
+            
+            # Show round evaluation
+            evaluation = result['round_evaluation']
+            print(f"\n📈 Round {result['round_number']} Evaluation:")
+            print(f"🏆 Round Winner: {evaluation['round_winner']}")
+            print(f"💬 Feedback: {evaluation['feedback']}")
+            print(f"⭐ Strongest Point: {evaluation['strongest_point']}")
+            
+            # Update round count
+            round_count = result['round_number']
+            
+            if not result['continue_debate']:
+                break
+                
+            # Ask if user wants to continue
+            speak("அடுத்த சுற்றுக்கு தயாரா? Continue என்று சொல்லுங்கள்.")
+            continue_response = recognize_speech().lower()
+            
+            if any(word in continue_response for word in ["stop", "end", "finish", "நிறுத்து", "முடி"]):
+                break
+                
+        except Exception as e:
+            speak("வாதத்தை புரிந்துகொள்ள முடியவில்லை. மீண்டும் முயற்சிக்கவும்.")
+            print(f"❌ Error in debate round: {e}")
+            continue
+    
+    # End debate and show final results
+    final_result = debate_mode.end_debate()
+    show_debate_conclusion(final_result)
+
+
+def show_debate_conclusion(final_result):
+    """Show final debate results and evaluation"""
+    print("\n🏁 === DEBATE CONCLUDED ===")
+    speak("விவாதம் முடிந்தது! முடிவுகளை காண்போம்.")
+    
+    print(f"🏆 Overall Winner: {final_result['overall_winner'].upper()}")
+    print(f"📊 Final Score - You: {final_result['final_score']['user']}, AI: {final_result['final_score']['ai']}")
+    
+    speak(f"ஒட்டுமொத்த வெற்றியாளர்: {final_result['overall_winner']}")
+    
+    print(f"\n✅ Your Strengths: {', '.join(final_result['user_strengths'])}")
+    print(f"📈 Areas for Improvement: {', '.join(final_result['user_improvements'])}")
+    print(f"🎯 Key Insights: {', '.join(final_result['key_insights'])}")
+    print(f"📚 Learning Outcomes: {', '.join(final_result['learning_outcomes'])}")
+    print(f"\n📝 Summary: {final_result['summary']}")
+    
+    speak("சிறந்த விவாதம்! நீங்கள் நல்லா பங்கேற்றீர்கள்.")
+    log_conversation("Debate Conclusion", f"Winner: {final_result['overall_winner']}, Quality: {final_result['debate_quality']}")
+
+
+def show_debate_statistics():
+    """Show debate statistics and history"""
+    stats = debate_mode.get_debate_stats()
+    
+    print("\n📊 === DEBATE STATISTICS ===")
+    print(f"🎯 Total Debates: {stats['total_debates']}")
+    print(f"🏆 Your Wins: {stats['user_wins']} ({stats['user_win_rate']}%)")
+    print(f"🤖 AI Wins: {stats['ai_wins']} ({stats['ai_win_rate']}%)")
+    print(f"🤝 Draws: {stats['draws']} ({stats['draw_rate']}%)")
+    
+    if stats['recent_topics']:
+        print("\n📝 Recent Debate Topics:")
+        for i, topic_info in enumerate(stats['recent_topics'], 1):
+            print(f"   {i}. {topic_info['topic']} (Winner: {topic_info['winner']})")
+    
+    speak(f"மொத்தம் {stats['total_debates']} விவாதங்கள் செய்துள்ளீர்கள். உங்கள் வெற்றி விகிதம் {stats['user_win_rate']} சதவீதம்.")
+
+
 # Process user commands
 def process_command(command):
     if not command:
@@ -487,8 +1013,18 @@ def process_command(command):
                 search_and_play_song_no_auth(song_name)  # Use no-auth version
                 return
 
-    # If user wants translator mode
-    if any(kw in command.lower() for kw in ["translator", "translate", "மொழிபெயர்ப்பு", "tamil to hindi", "ஆக்டிவேட் டிரான்ஸ்லேட் மோட்", "டிரான்ஸ்லேட்"]):
+    # If user wants debate mode
+    if any(kw in command.lower() for kw in ["debate mode", "debate", "விவாதம்", "டிபேட் மோட்", "discussion", "argue", "விவாதிக்க", "டிபேட்"]):
+        debate_mode_session()
+        return
+    
+    # If user wants language learning mode
+    if any(kw in command.lower() for kw in ["language mode", "language learning", "லாং்குवেজ் மோড്", "কর্তল முறை", "learn language", "language teach", "மொழি কர্ক"]):
+        language_learning_mode()
+        return
+    
+    # If user wants translator mode (basic)
+    if any(kw in command.lower() for kw in ["translator", "translate", "মোژিপেয়র్প্প্", "tamil to hindi", "আক্টিভেত্ ট্রান্স্লেট্ মোড়্", "ট্রান্স্লেত্"]):
         translation_loop()
         return
 
@@ -497,17 +1033,198 @@ def process_command(command):
         log_conversation("Assistant", "Executed general task command.")
         return
 
-    # If none of the above, use Gemini AI to respond
+    # If none of the above, use Gemini AI to respond with smart hardware
+    smart_visual_feedback('thinking')
     response = get_response(command)
     log_conversation("Assistant", response)
-    speak(response)
+    smart_speak_response(response)
 
+
+# Smart hardware listening with fallback
+def smart_listen_command():
+    """Listen for commands using smart hardware manager with fallbacks"""
+    try:
+        hardware_manager = get_hardware_manager()
+        
+        # Use smart listening with fallback
+        result = smart_listen(timeout=10, simulation_input="hello laura")
+        
+        if result['success']:
+            print(f"🎤 Input via {result['method_used']}: {result['data']}")
+            return result['data']
+        else:
+            print(f"❌ Listening failed: {result['message']}")
+            return ""
+            
+    except Exception as e:
+        print(f"⚠️ Smart listen error: {e}")
+        # Fallback to original listening
+        try:
+            return listen()
+        except:
+            return ""
+
+# Smart speaking with hardware fallback
+def smart_speak_response(message):
+    """Speak response using smart hardware manager with fallbacks"""
+    try:
+        result = smart_speak(message)
+        print(f"🔊 Output via {result['method_used']}: {result['message']}")
+        
+        # Also provide visual feedback
+        if "correct" in message.lower() or "good" in message.lower():
+            smart_visual_feedback('celebrate')
+        elif "thinking" in message.lower() or "processing" in message.lower():
+            smart_visual_feedback('thinking')
+        else:
+            smart_visual_feedback('listening')
+            
+    except Exception as e:
+        print(f"⚠️ Smart speak error: {e}")
+        # Fallback to original speaking
+        try:
+            speak(message)
+        except:
+            print(f"[FALLBACK TEXT]: {message}")
+
+# Hardware-aware command processing
+def process_command_with_hardware(command):
+    """Process commands with hardware awareness"""
+    if not command:
+        return
+
+    print(f"[USER COMMAND]: {command}")
+    log_conversation("User", command)
+
+    # Hardware testing commands
+    if any(kw in command.lower() for kw in ["test hardware", "hardware test", "check hardware", "hardware status"]):
+        hardware_manager = get_hardware_manager()
+        hardware_manager.test_all_hardware()
+        smart_speak_response("ஹார்ட்வேர் டெஸ்ட் முடிந்தது. எல்லா கம்போனெண்ட்ஸ் சரிபார்க்கப்பட்டது.")
+        return
+
+    # Hardware report command  
+    if any(kw in command.lower() for kw in ["hardware report", "system status", "சிஸ்டம் ஸ்டேட்டஸ்"]):
+        hardware_manager = get_hardware_manager()
+        hardware_manager.generate_hardware_report()
+        smart_speak_response("சிஸ்டம் ரிப்போர்ட் தயார். கன்சோலில் பார்க்கவும்.")
+        return
+
+    # Gesture recognition command
+    if any(kw in command.lower() for kw in ["recognize gesture", "gesture recognition", "கை சைகை அடையாளம்"]):
+        result = smart_gesture_recognition()
+        if result['success']:
+            gesture = result['data']
+            response = f"கை சைகை கண்டுபிடிக்கப்பட்டது: {gesture}"
+            smart_speak_response(response)
+            smart_visual_feedback('celebrate')
+        else:
+            smart_speak_response("கை சைகை கண்டுபிடிக்க முடியவில்லை.")
+        return
+
+    # If gesture command (enhanced with hardware)
+    if any(kw in command.lower() for kw in
+           ["gesture", "கை சைகை", "open gesture", "start gesture", "ஆக்டிவேட் ஜெஸ்சர்", "activate gesture"]):
+        # Try smart gesture recognition first
+        result = smart_gesture_recognition()
+        if result['method_used'] == 'camera':
+            smart_speak_response("கேமரா வழியாக கை சைகை அடையாளம் காணப்படுகிறது.")
+        else:
+            # Fallback to original gesture window
+            open_gesture_window()
+        return
+
+    # If GIF display command
+    if any(kw in command.lower() for kw in ["gif", "show gif", "display gif", "GIF காட்டு", "gif காட்டு"]):
+        listen_and_show_gif()
+        return
+
+    # If Spotify/music command
+    if any(kw in command.lower() for kw in
+           ["play song", "play music", "spotify", "பாடல் இசை", "இசை இசை", "song play", "music play", "ப்ளே மியூசிக்",
+            "மியூசிக் ப்ளே"]):
+        listen_for_song_request()
+        return
+
+    # If direct song search (contains "play" + song name)
+    if "play" in command.lower() and len(command.split()) > 1:
+        # Extract song name after "play"
+        parts = command.lower().split("play", 1)
+        if len(parts) > 1:
+            song_name = parts[1].strip()
+            if song_name:
+                search_and_play_song_no_auth(song_name)  # Use no-auth version
+                return
+
+    # If user wants debate mode
+    if any(kw in command.lower() for kw in ["debate mode", "debate", "விவாதம்", "டிபேட் மோட்", "discussion", "argue", "விவாதிக்க", "டிபேட்"]):
+        smart_visual_feedback('thinking')
+        debate_mode_session()
+        return
+    
+    # If user wants language learning mode
+    if any(kw in command.lower() for kw in ["language mode", "language learning", "லாங்குवेজ் மோட্", "কর্তল முறை", "learn language", "language teach", "মোজি கর্क"]):
+        smart_visual_feedback('listening')
+        language_learning_mode()
+        return
+    
+    # If user wants translator mode (basic)
+    if any(kw in command.lower() for kw in ["translator", "translate", "মোজিপেয়র্প্প্", "tamil to hindi", "আক্টিভেت্ ট্রান্স্লেট্ মোড়্", "ট্রান্স্লেত্"]):
+        smart_visual_feedback('listening')
+        translation_loop()
+        return
+
+    # If general task command
+    if execute_command(command):
+        log_conversation("Assistant", "Executed general task command.")
+        smart_visual_feedback('celebrate')
+        return
+
+    # If none of the above, use Gemini AI to respond
+    smart_visual_feedback('thinking')
+    response = get_response(command)
+    log_conversation("Assistant", response)
+    smart_speak_response(response)
 
 # Entry point
 if __name__ == "__main__":
-    welcome_msg = "வணக்கம்! நான் ஜாரா. இன்று நான் உங்களுக்கு எப்படி உதவ முடியும்?"
-    speak(welcome_msg)
+    print("🚀 Initializing Laura-bot with Smart Hardware Management...")
+    
+    # Initialize smart hardware management
+    try:
+        hardware_manager = initialize_smart_hardware()
+        print("✅ Smart hardware management initialized")
+    except Exception as e:
+        print(f"⚠️ Hardware initialization error: {e}")
+        print("🤖 Continuing with basic functionality...")
+    
+    welcome_msg = "வணக்கம்! நான் லாரா. இன்று நான் உங்களுக்கு எப்படி உதவ முடியும்?"
+    smart_speak_response(welcome_msg)
     log_conversation("Assistant", welcome_msg)
+    
+    print("\n💡 Available Commands:")
+    print("🎤 Voice Commands: 'debate mode', 'language learning', 'play music'")
+    print("🔧 Hardware Commands: 'test hardware', 'hardware report', 'recognize gesture'")
+    print("🎮 Gesture Commands: 'gesture', 'activate gesture'")
+    print("🌐 Web Interface: Run 'python laura_bot_server.py' for web access")
+    print("\n🎯 Say something to start...")
+    
     while True:
-        command = listen()
-        process_command(command)
+        try:
+            command = smart_listen_command()
+            process_command_with_hardware(command)
+        except KeyboardInterrupt:
+            print("\n👋 Goodbye!")
+            smart_speak_response("வணக்கம்! மீண்டும் வருக!")
+            
+            # Cleanup hardware
+            try:
+                hardware_manager = get_hardware_manager()
+                hardware_manager.cleanup()
+            except:
+                pass
+            break
+        except Exception as e:
+            print(f"⚠️ Main loop error: {e}")
+            smart_speak_response("மன்னிக்கவும், ஏதோ பிரச்சனை. மீண்டும் முயற்சிக்கவும்.")
+            continue

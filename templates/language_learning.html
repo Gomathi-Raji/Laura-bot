@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Learning Mode - Laura Bot</title>
+    
+    <!-- CSS Files with Dark Gradient Theme -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-ui.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-responsive.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-app.css') }}">
+    
+    <style>
+        .language-learning-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .language-mode-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .language-mode-header h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .language-combinations {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .language-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .language-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .language-card.active {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+            border-color: #667eea;
+        }
+        
+        .language-flag {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .language-pair {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        
+        .language-native {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+        
+        .translation-interface {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: none;
+        }
+        
+        .translation-interface.active {
+            display: block;
+        }
+        
+        .input-section {
+            margin-bottom: 2rem;
+        }
+        
+        .input-section textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 1rem;
+            color: white;
+            font-size: 1.1rem;
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .input-section textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .translation-result {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            border-left: 4px solid #667eea;
+        }
+        
+        .result-translation {
+            font-size: 1.3rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+        
+        .result-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .detail-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 10px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .detail-content {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+        }
+        
+        .voice-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .voice-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50px;
+            padding: 1rem 2rem;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .voice-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .voice-btn.listening {
+            animation: pulse 2s infinite;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .practice-suggestions {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .suggestions-title {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .suggestion-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.8rem;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .suggestion-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .learning-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 0.5rem;
+        }
+
+        .quiz-container {
+            display: none;
+        }
+        
+        .quiz-container.active {
+            display: block;
+        }
+        
+        .quiz-question {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .quiz-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .quiz-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #667eea;
+        }
+        
+        .quiz-option.selected {
+            background: rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+        
+        .quiz-option.correct {
+            background: rgba(76, 175, 80, 0.3);
+            border-color: #4caf50;
+        }
+        
+        .quiz-option.incorrect {
+            background: rgba(244, 67, 54, 0.3);
+            border-color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="language-learning-container">
+        <div class="language-mode-header">
+            <h1>🎓 Language Learning Mode</h1>
+            <p class="subtitle">Learn Tamil, English & Hindi with Interactive AI</p>
+        </div>
+        
+        <!-- Language Selection -->
+        <div class="language-combinations">
+            <div class="language-card" data-source="tamil" data-target="english">
+                <div class="language-flag">தமிழ் ➡️ 🇬🇧</div>
+                <div class="language-pair">Tamil to English</div>
+                <div class="language-native">தமிழ் ➡️ இங்கிலீஷ்</div>
+            </div>
+            
+            <div class="language-card" data-source="tamil" data-target="hindi">
+                <div class="language-flag">தமிழ் ➡️ 🇮🇳</div>
+                <div class="language-pair">Tamil to Hindi</div>
+                <div class="language-native">தமிழ் ➡️ ஹிந்தி</div>
+            </div>
+            
+            <div class="language-card" data-source="english" data-target="tamil">
+                <div class="language-flag">🇬🇧 ➡️ தமிழ்</div>
+                <div class="language-pair">English to Tamil</div>
+                <div class="language-native">இங்கிலீஷ் ➡️ தமிழ்</div>
+            </div>
+            
+            <div class="language-card" data-source="english" data-target="hindi">
+                <div class="language-flag">🇬🇧 ➡️ 🇮🇳</div>
+                <div class="language-pair">English to Hindi</div>
+                <div class="language-native">இங்கிலீஷ் ➡️ ஹிந்தி</div>
+            </div>
+            
+            <div class="language-card" data-source="hindi" data-target="tamil">
+                <div class="language-flag">🇮🇳 ➡️ தமிழ்</div>
+                <div class="language-pair">Hindi to Tamil</div>
+                <div class="language-native">ஹிந்தி ➡️ தมிழ்</div>
+            </div>
+            
+            <div class="language-card" data-source="hindi" data-target="english">
+                <div class="language-flag">🇮🇳 ➡️ 🇬🇧</div>
+                <div class="language-pair">Hindi to English</div>
+                <div class="language-native">హింది ➡್‌ইংলিশ్</div>
+            </div>
+        </div>
+        
+        <!-- Translation Interface -->
+        <div class="translation-interface" id="translationInterface">
+            <div class="input-section">
+                <h3>Enter text to translate:</h3>
+                <textarea id="inputText" placeholder="Type or use voice input..."></textarea>
+            </div>
+            
+            <div class="voice-controls">
+                <button class="voice-btn" id="listenBtn">🎤 Listen</button>
+                <button class="voice-btn" id="translateBtn">🔄 Translate</button>
+                <button class="voice-btn" id="speakBtn">🔊 Speak</button>
+            </div>
+            
+            <div id="translationResult" class="translation-result" style="display: none;">
+                <div class="result-translation" id="resultText"></div>
+                <div class="result-details">
+                    <div class="detail-item">
+                        <div class="detail-label">Pronunciation</div>
+                        <div class="detail-content" id="pronunciation"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Grammar Note</div>
+                        <div class="detail-content" id="grammarNote"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Cultural Context</div>
+                        <div class="detail-content" id="culturalContext"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Difficulty</div>
+                        <div class="detail-content" id="difficulty"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="practice-suggestions">
+                <div class="suggestions-title">💡 Practice Suggestions</div>
+                <div id="practiceList"></div>
+            </div>
+        </div>
+        
+        <!-- Quiz Mode -->
+        <div class="quiz-container" id="quizContainer">
+            <div class="quiz-question">
+                <h3 id="quizQuestion">Loading quiz...</h3>
+            </div>
+            <div class="quiz-options" id="quizOptions">
+            </div>
+            <div class="voice-controls">
+                <button class="voice-btn" id="nextQuizBtn">Next Question</button>
+                <button class="voice-btn" id="finishQuizBtn">Finish Quiz</button>
+            </div>
+        </div>
+        
+        <!-- Learning Statistics -->
+        <div class="learning-stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalTranslations">0</div>
+                <div class="stat-label">Total Translations</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="sessionCount">0</div>
+                <div class="stat-label">This Session</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="masteryLevel">Beginner</div>
+                <div class="stat-label">Mastery Level</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="languagesPracticed">0</div>
+                <div class="stat-label">Languages Practiced</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentSourceLang = '';
+        let currentTargetLang = '';
+        let isListening = false;
+        
+        // Language selection
+        document.querySelectorAll('.language-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove active class from all cards
+                document.querySelectorAll('.language-card').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked card
+                this.classList.add('active');
+                
+                // Get selected languages
+                currentSourceLang = this.dataset.source;
+                currentTargetLang = this.dataset.target;
+                
+                // Show translation interface
+                document.getElementById('translationInterface').classList.add('active');
+                
+                // Load practice suggestions
+                loadPracticeSuggestions();
+                
+                // Update stats
+                loadLearningStats();
+            });
+        });
+        
+        // Voice input
+        document.getElementById('listenBtn').addEventListener('click', function() {
+            if (!isListening) {
+                startListening();
+            } else {
+                stopListening();
+            }
+        });
+        
+        // Translation
+        document.getElementById('translateBtn').addEventListener('click', function() {
+            const inputText = document.getElementById('inputText').value.trim();
+            if (inputText && currentSourceLang && currentTargetLang) {
+                translateText(inputText);
+            }
+        });
+        
+        // Speak result
+        document.getElementById('speakBtn').addEventListener('click', function() {
+            const resultText = document.getElementById('resultText').textContent;
+            if (resultText) {
+                speakText(resultText);
+            }
+        });
+        
+        function startListening() {
+            isListening = true;
+            const btn = document.getElementById('listenBtn');
+            btn.classList.add('listening');
+            btn.textContent = '🛑 Stop';
+            
+            // Web Speech API
+            if ('webkitSpeechRecognition' in window) {
+                const recognition = new webkitSpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                
+                // Set language based on source language
+                const langCodes = {
+                    'tamil': 'ta-IN',
+                    'english': 'en-US',
+                    'hindi': 'hi-IN'
+                };
+                recognition.lang = langCodes[currentSourceLang] || 'en-US';
+                
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('inputText').value = transcript;
+                    stopListening();
+                };
+                
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error:', event.error);
+                    stopListening();
+                };
+                
+                recognition.onend = function() {
+                    stopListening();
+                };
+                
+                recognition.start();
+            } else {
+                alert('Speech recognition not supported in this browser');
+                stopListening();
+            }
+        }
+        
+        function stopListening() {
+            isListening = false;
+            const btn = document.getElementById('listenBtn');
+            btn.classList.remove('listening');
+            btn.textContent = '🎤 Listen';
+        }
+        
+        function translateText(text) {
+            // Show loading state
+            const resultDiv = document.getElementById('translationResult');
+            resultDiv.style.display = 'block';
+            document.getElementById('resultText').textContent = 'Translating...';
+            
+            // Call backend API (you'll need to implement this endpoint)
+            fetch('/api/translate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: text,
+                    source_lang: currentSourceLang,
+                    target_lang: currentTargetLang
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                displayTranslationResult(data);
+            })
+            .catch(error => {
+                console.error('Translation error:', error);
+                document.getElementById('resultText').textContent = 'Translation failed. Please try again.';
+            });
+        }
+        
+        function displayTranslationResult(data) {
+            document.getElementById('resultText').textContent = data.translation || 'No translation available';
+            document.getElementById('pronunciation').textContent = data.pronunciation || 'N/A';
+            document.getElementById('grammarNote').textContent = data.grammar_note || 'N/A';
+            document.getElementById('culturalContext').textContent = data.cultural_context || 'N/A';
+            document.getElementById('difficulty').textContent = data.difficulty_level || 'beginner';
+        }
+        
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Set voice based on target language
+                const voices = speechSynthesis.getVoices();
+                const langCodes = {
+                    'tamil': 'ta',
+                    'english': 'en',
+                    'hindi': 'hi'
+                };
+                
+                const targetVoice = voices.find(voice => 
+                    voice.lang.startsWith(langCodes[currentTargetLang])
+                );
+                
+                if (targetVoice) {
+                    utterance.voice = targetVoice;
+                }
+                
+                speechSynthesis.speak(utterance);
+            }
+        }
+        
+        function loadPracticeSuggestions() {
+            const practiceList = document.getElementById('practiceList');
+            
+            // Sample practice suggestions (in a real app, fetch from backend)
+            const suggestions = [
+                'Hello / வணக்கம் / नमस्ते',
+                'Thank you / நன்றி / धन्यवाद',
+                'How are you? / எப்படி இருக்கிறீர்கள்? / आप कैसे हैं?',
+                'I am fine / நான் நல்லா இருக்கேன் / मैं ठीक हूं',
+                'What is your name? / உங்கள் பெயர் என்ன? / आपका नाम क्या है?'
+            ];
+            
+            practiceList.innerHTML = '';
+            suggestions.forEach(suggestion => {
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                item.textContent = suggestion;
+                item.addEventListener('click', function() {
+                    const parts = suggestion.split(' / ');
+                    if (parts.length > 0) {
+                        document.getElementById('inputText').value = parts[0];
+                    }
+                });
+                practiceList.appendChild(item);
+            });
+        }
+        
+        function loadLearningStats() {
+            // Sample stats (in a real app, fetch from backend)
+            document.getElementById('totalTranslations').textContent = '42';
+            document.getElementById('sessionCount').textContent = '3';
+            document.getElementById('masteryLevel').textContent = 'Intermediate';
+            document.getElementById('languagesPracticed').textContent = '3';
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLearningStats();
+        });
+    </script>
+</body>
+</html>
